@@ -15,7 +15,6 @@ import sys
 from pathlib import Path
 from typing import Optional, Tuple
 
-import cv2
 import numpy as np
 import streamlit as st
 import torch
@@ -29,11 +28,9 @@ from src.config import (
     CLASS_NAMES,
     DEVICE,
     IMG_SIZE,
-    QUALITY_FACTORS,
     MAX_HISTORY,
     CHECKPOINT_BEST,
     CHECKPOINT_LAST,
-    PLOTS_DIR,
 )
 from src.gradcam import GradCAM
 from src.model import build_densenet121
@@ -51,465 +48,531 @@ st.set_page_config(
     page_title="DeepFake Detector",
     page_icon="\U0001F50D",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 
-# ─── CSS Personalizado ───────────────────────────────────────────────────────
+# ─── CSS Personalizado - Premium Dark AI Dashboard ───────────────────────────
 
 CUSTOM_CSS = """
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
+    /* ── Variables ── */
     :root {
-        --bg: #0F0D0A;
-        --bg-card: #1A1612;
-        --bg-card-hover: #221E18;
-        --border: #2A2520;
-        --border-light: #3A3430;
-        --text: #E8E2D5;
-        --text-muted: #9A9488;
-        --text-dim: #6A6458;
-        --accent: #D4935A;
-        --accent-glow: rgba(212, 147, 90, 0.12);
-        --accent-border: rgba(212, 147, 90, 0.25);
-        --teal: #5C8A7A;
-        --teal-glow: rgba(92, 138, 122, 0.12);
-        --red: #C2514A;
-        --red-glow: rgba(194, 81, 74, 0.12);
-        --red-border: rgba(194, 81, 74, 0.25);
-        --green: #6B9F71;
-        --green-glow: rgba(107, 159, 113, 0.12);
-        --green-border: rgba(107, 159, 113, 0.25);
-        --amber: #C8A06A;
-        --font-serif: 'Playfair Display', Georgia, serif;
+        --bg-primary: #08080F;
+        --bg-secondary: #0D0D18;
+        --bg-card: #111122;
+        --bg-card-hover: #161629;
+        --border: #1E1E32;
+        --border-light: #2A2A44;
+        --text: #EEEEF8;
+        --text-secondary: #8888B0;
+        --text-muted: #55557A;
+        --accent-1: #7C5CFC;
+        --accent-2: #5C9DFC;
+        --accent-gradient: linear-gradient(135deg, #7C5CFC, #5C9DFC);
+        --glow-purple: rgba(124, 92, 252, 0.15);
+        --glow-blue: rgba(92, 157, 252, 0.1);
+        --success: #2ED47A;
+        --success-bg: rgba(46, 212, 122, 0.1);
+        --success-border: rgba(46, 212, 122, 0.2);
+        --danger: #FF6B6B;
+        --danger-bg: rgba(255, 107, 107, 0.1);
+        --danger-border: rgba(255, 107, 107, 0.2);
+        --warning: #FFB545;
+        --warning-bg: rgba(255, 181, 69, 0.1);
         --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
     }
 
+    /* ── Base ── */
     .stApp {
-        background: var(--bg);
+        background: var(--bg-primary);
         font-family: var(--font-sans);
         color: var(--text);
     }
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    .stDeployButton {display: none;}
+    #MainMenu, footer, .stDeployButton { display: none; }
 
-    /* ── Tipografía ── */
-    h1, h2, h3, h4, .serif {
-        font-family: var(--font-serif);
-        color: var(--text);
+    /* ── Sidebar ── */
+    [data-testid="stSidebar"] {
+        background: var(--bg-secondary) !important;
+        border-right: 1px solid var(--border);
     }
-    .mono {
-        font-family: var(--font-mono);
-    }
+    [data-testid="stSidebar"] .stMarkdown { color: var(--text-secondary); }
+    [data-testid="stSidebar"] hr { border-color: var(--border) !important; }
 
-    /* ── Hero Section ── */
-    .hero {
-        padding: 3rem 1.5rem 2rem;
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* ── Hero / Header ── */
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem 0 1rem;
         border-bottom: 1px solid var(--border);
         margin-bottom: 2rem;
+    }
+    .header-left { display: flex; align-items: center; gap: 1rem; }
+    .header-logo {
+        width: 40px; height: 40px;
+        background: var(--accent-gradient);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.3rem;
+    }
+    .header-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.3px;
+        margin: 0;
+    }
+    .header-sub {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        margin: 0;
+    }
+    .header-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+    }
+    .status-dot {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+        box-shadow: 0 0 8px rgba(46, 212, 122, 0.4);
+    }
+    .status-text {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        font-family: var(--font-mono);
+    }
+
+    /* ── Hero section ── */
+    .hero {
+        text-align: center;
+        padding: 2.5rem 1rem 2rem;
         position: relative;
     }
-    .hero::after {
-        content: '';
+    .hero-glow {
         position: absolute;
-        bottom: -1px;
-        left: 0;
-        width: 120px;
-        height: 2px;
-        background: var(--accent);
+        top: -30%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(ellipse, rgba(124,92,252,0.08) 0%, transparent 70%);
+        pointer-events: none;
     }
-    .hero-label {
-        font-family: var(--font-mono);
-        font-size: 0.7rem;
-        color: var(--text-dim);
-        text-transform: uppercase;
-        letter-spacing: 3px;
-        margin-bottom: 0.75rem;
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 1rem;
+        background: var(--glow-purple);
+        border: 1px solid rgba(124,92,252,0.2);
+        border-radius: 20px;
+        font-size: 0.75rem;
+        color: var(--accent-1);
+        font-weight: 500;
+        margin-bottom: 1rem;
     }
     .hero-title {
-        font-family: var(--font-serif);
-        font-size: 3.2rem;
+        font-size: 3rem;
         font-weight: 800;
         color: var(--text);
-        line-height: 1.1;
+        letter-spacing: -1px;
         margin: 0 0 0.75rem;
-        letter-spacing: -0.5px;
+        line-height: 1.15;
     }
-    .hero-title em {
-        font-style: italic;
-        color: var(--accent);
+    .hero-title span {
+        background: var(--accent-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
     .hero-sub {
         font-size: 1rem;
-        color: var(--text-muted);
-        max-width: 580px;
+        color: var(--text-secondary);
+        max-width: 560px;
+        margin: 0 auto;
         line-height: 1.7;
-        font-weight: 300;
+        font-weight: 400;
     }
-    .hero-sub strong {
-        color: var(--text);
-        font-weight: 500;
-    }
+    .hero-sub strong { color: var(--text); font-weight: 500; }
 
     /* ── Cards ── */
     .card {
         background: var(--bg-card);
         border: 1px solid var(--border);
+        border-radius: 12px;
         padding: 1.5rem;
-        transition: all 0.25s ease;
+        transition: all 0.2s ease;
     }
     .card:hover {
-        background: var(--bg-card-hover);
         border-color: var(--border-light);
+        background: var(--bg-card-hover);
     }
     .card-title {
-        font-family: var(--font-serif);
-        font-size: 1.1rem;
+        font-size: 0.9rem;
         font-weight: 600;
-        color: var(--text);
+        color: var(--text-secondary);
         margin: 0 0 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid var(--border);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .card-icon {
+        width: 36px; height: 36px;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
     }
 
-    /* ── Result Cards ── */
+    /* ── Result Card ├-- */
     .result-card {
-        padding: 2rem 1.5rem;
+        padding: 1.75rem;
+        border-radius: 12px;
         text-align: center;
-        border: 1px solid;
-        transition: all 0.3s ease;
     }
     .result-card.fake {
-        background: var(--red-glow);
-        border-color: var(--red-border);
+        background: linear-gradient(135deg, rgba(255,107,107,0.12), rgba(255,107,107,0.04));
+        border: 1px solid var(--danger-border);
     }
     .result-card.real {
-        background: var(--green-glow);
-        border-color: var(--green-border);
+        background: linear-gradient(135deg, rgba(46,212,122,0.12), rgba(46,212,122,0.04));
+        border: 1px solid var(--success-border);
     }
-    .result-card .icon {
-        font-size: 3.5rem;
-        display: block;
-        margin-bottom: 0.75rem;
-        line-height: 1;
+    .result-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
     }
-    .result-card .label {
-        font-family: var(--font-serif);
-        font-size: 2.2rem;
+    .result-label {
+        font-size: 2rem;
         font-weight: 800;
-        margin: 0;
         letter-spacing: 1px;
+        margin: 0;
     }
-    .result-card .label.fake { color: var(--red); }
-    .result-card .label.real { color: var(--green); }
-    .result-card .sub {
-        font-size: 0.8rem;
-        color: var(--text-dim);
-        margin-top: 0.4rem;
+    .result-label.fake { color: var(--danger); }
+    .result-label.real { color: var(--success); }
+    .result-sub {
+        font-size: 0.75rem;
+        color: var(--text-muted);
         font-family: var(--font-mono);
         text-transform: uppercase;
-        letter-spacing: 2px;
+        letter-spacing: 1.5px;
+        margin-top: 0.3rem;
     }
 
-    /* ── Confidence Ring ── */
-    .gauge-wrap {
-        text-align: center;
-        padding: 0.75rem;
-    }
+    /* ── Gauge ── */
+    .gauge-wrap { text-align: center; padding: 0.5rem; }
     .gauge-ring {
         position: relative;
-        width: 130px;
-        height: 130px;
+        width: 120px; height: 120px;
         margin: 0 auto 0.75rem;
     }
     .gauge-ring svg { transform: rotate(-90deg); }
-    .gauge-ring .track {
-        fill: none;
-        stroke: rgba(255,255,255,0.06);
+    .gauge-track {
+        fill: none; stroke: rgba(255,255,255,0.05);
         stroke-width: 6;
     }
-    .gauge-ring .fill {
-        fill: none;
-        stroke-width: 6;
+    .gauge-fill {
+        fill: none; stroke-width: 6;
         stroke-linecap: round;
-        transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .gauge-val {
         position: absolute;
-        top: 50%;
-        left: 50%;
+        top: 50%; left: 50%;
         transform: translate(-50%, -50%);
-        font-family: var(--font-serif);
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         font-weight: 700;
+        font-family: var(--font-sans);
     }
     .gauge-label {
         font-size: 0.7rem;
-        color: var(--text-dim);
+        color: var(--text-muted);
         text-transform: uppercase;
-        letter-spacing: 2.5px;
+        letter-spacing: 2px;
         font-family: var(--font-mono);
     }
 
-    /* ── Score Bar ── */
-    .score-box {
-        text-align: center;
-        padding: 0.75rem;
-    }
-    .score-box .emoji-icon {
-        font-size: 2.2rem;
-        margin-bottom: 0.5rem;
-    }
-    .score-box .value {
-        font-family: var(--font-mono);
+    /* ── Score ── */
+    .score-wrap { text-align: center; padding: 0.5rem; }
+    .score-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .score-num {
         font-size: 1.8rem;
-        font-weight: 500;
+        font-weight: 600;
+        font-family: var(--font-mono);
         color: var(--text);
     }
-    .score-box .label {
+    .score-lbl {
         font-size: 0.7rem;
-        color: var(--text-dim);
+        color: var(--text-muted);
         text-transform: uppercase;
-        letter-spacing: 2.5px;
+        letter-spacing: 2px;
         font-family: var(--font-mono);
-        margin-top: 0.15rem;
+        margin-top: 0.1rem;
     }
-    .score-track {
+    .score-bar {
         margin-top: 0.75rem;
-        padding: 0.6rem 0.75rem;
-        background: rgba(255,255,255,0.03);
+        padding: 0.5rem 0.75rem;
+        background: rgba(255,255,255,0.02);
         border: 1px solid var(--border);
+        border-radius: 6px;
     }
-    .score-track .ticks {
-        display: flex;
-        justify-content: space-between;
+    .score-bar-labels {
+        display: flex; justify-content: space-between;
         font-family: var(--font-mono);
-        font-size: 0.6rem;
-        color: var(--text-dim);
-        margin-bottom: 0.35rem;
+        font-size: 0.55rem;
+        color: var(--text-muted);
+        margin-bottom: 0.3rem;
     }
-    .score-track .bar {
-        width: 100%;
-        height: 3px;
-        background: rgba(255,255,255,0.08);
+    .score-bar-track {
+        width: 100%; height: 3px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 2px;
+        overflow: hidden;
     }
-    .score-track .bar-fill {
+    .score-bar-fill {
         height: 100%;
-        background: linear-gradient(90deg, var(--red), var(--amber), var(--green));
-        transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(90deg, var(--danger), var(--warning), var(--success));
+        border-radius: 2px;
+        transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* ── Section Titles ── */
+    /* ── Seccion Title ── */
     .sec-title {
-        font-family: var(--font-serif);
-        font-size: 1.4rem;
-        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 1.15rem;
+        font-weight: 600;
         color: var(--text);
-        margin: 2rem 0 1.2rem;
-        padding-bottom: 0.5rem;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.75rem;
         border-bottom: 1px solid var(--border);
-        position: relative;
     }
-    .sec-title::after {
-        content: '';
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        width: 60px;
-        height: 2px;
-        background: var(--accent);
+    .sec-title-dot {
+        width: 4px; height: 20px;
+        background: var(--accent-gradient);
+        border-radius: 2px;
     }
 
     /* ── Explanation ── */
     .explain-box {
-        background: rgba(255,255,255,0.02);
-        border: 1px solid var(--border);
         padding: 1.25rem;
-        font-size: 0.95rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.9rem;
         line-height: 1.8;
-        color: var(--text-muted);
+        color: var(--text-secondary);
+        background: rgba(255,255,255,0.015);
     }
-    .explain-box strong {
-        color: var(--accent);
-        font-weight: 600;
-    }
+    .explain-box strong { color: var(--accent-1); font-weight: 500; }
 
     /* ── Heatmap Legend ── */
     .heat-legend {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        justify-content: center;
+        display: flex; align-items: center;
+        gap: 10px; justify-content: center;
         margin-top: 0.75rem;
     }
     .heat-legend span {
-        font-size: 0.7rem;
-        color: var(--text-dim);
+        font-size: 0.65rem;
+        color: var(--text-muted);
         font-family: var(--font-mono);
     }
     .heat-bar {
-        width: 160px;
-        height: 8px;
-        background: linear-gradient(to right, #2A4A6A, #3A7A6A, #5A8A4A, #B08A3A, #B04A3A);
+        width: 160px; height: 8px;
+        border-radius: 4px;
+        background: linear-gradient(to right, #1A3A6A, #2A6A8A, #3A8A5A, #8A8A3A, #9A3A3A);
     }
 
-    /* ── Buttons ── */
-    div.stButton > button:first-child {
-        background: transparent;
-        color: var(--text);
-        border: 1px solid var(--accent-border);
-        border-radius: 0;
-        padding: 0.6rem 1.8rem;
-        font-family: var(--font-sans);
-        font-weight: 500;
-        font-size: 0.95rem;
-        transition: all 0.25s ease;
-        letter-spacing: 0.3px;
-    }
-    div.stButton > button:first-child:hover {
-        background: var(--accent-glow);
-        border-color: var(--accent);
-        color: var(--accent);
-    }
-    div.stButton > button:first-child:active {
-        transform: none;
-    }
-    div.stButton > button:first-child:disabled {
-        opacity: 0.3;
-        border-color: var(--border);
-        color: var(--text-dim);
-    }
-
-    /* ── File Uploader ── */
+    /* ── Uploader ── */
     .stFileUploader {
-        border: 1px dashed var(--border-light);
-        padding: 0.75rem;
-        background: rgba(255,255,255,0.01);
+        border: 1.5px dashed rgba(124,92,252,0.25);
+        border-radius: 10px;
+        padding: 0.5rem;
+        background: rgba(124,92,252,0.03);
         transition: all 0.25s ease;
     }
     .stFileUploader:hover {
-        border-color: var(--accent-border);
-        background: var(--accent-glow);
+        border-color: rgba(124,92,252,0.5);
+        background: rgba(124,92,252,0.06);
     }
     .stFileUploader [data-testid="stFileUploaderDropzone"] {
         border: none !important;
         padding: 0.75rem;
     }
     .stFileUploader [data-testid="stFileUploaderDropzone"] div {
-        color: var(--text-muted) !important;
+        color: var(--text-secondary) !important;
         font-family: var(--font-sans) !important;
     }
     .stFileUploader [data-testid="stFileUploaderDropzone"] svg {
-        fill: var(--accent) !important;
+        fill: var(--accent-1) !important;
     }
     .stFileUploader [data-testid="stFileUploaderDropzone"] small {
-        color: var(--text-dim) !important;
+        color: var(--text-muted) !important;
     }
 
-    /* ── Sidebar ── */
-    [data-testid="stSidebar"] {
-        background: #0A0907 !important;
-        border-right: 1px solid var(--border);
-    }
-    [data-testid="stSidebar"] .stMarkdown {
-        color: var(--text-muted);
-    }
-    [data-testid="stSidebar"] hr {
-        border-color: var(--border) !important;
-    }
-
-    .sidebar-title {
-        font-family: var(--font-serif);
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--text);
-        text-align: center;
-        margin: 0;
-    }
-    .sidebar-sub {
-        font-size: 0.75rem;
-        color: var(--text-dim);
-        text-align: center;
-        font-family: var(--font-mono);
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-top: 0.3rem;
-    }
-    .sidebar-heading {
-        font-family: var(--font-serif);
-        font-size: 0.95rem;
+    /* ── Buttons ── */
+    div.stButton > button:first-child {
+        background: var(--accent-gradient);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.55rem 1.5rem;
+        font-family: var(--font-sans);
         font-weight: 600;
-        color: var(--text);
-        margin-bottom: 0.6rem;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 20px rgba(124,92,252,0.25);
     }
-    .sidebar-text {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        line-height: 1.7;
+    div.stButton > button:first-child:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 25px rgba(124,92,252,0.35);
     }
-    .sidebar-text strong, .sidebar-text b {
-        color: var(--accent);
-        font-weight: 500;
-    }
-    .sidebar-ol {
-        color: var(--text-muted);
-        font-size: 0.85rem;
-        line-height: 1.9;
-        padding-left: 1.1rem;
-        margin: 0;
+    div.stButton > button:first-child:active { transform: translateY(0); }
+    div.stButton > button:first-child:disabled {
+        opacity: 0.35;
+        box-shadow: none;
     }
 
-    /* ── Stats ── */
+    /* ── Secondary buttons ── */
+    div.stButton > button[kind="secondary"] {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+    div.stButton > button[kind="secondary"]:hover {
+        background: var(--glow-purple);
+        border-color: rgba(124,92,252,0.3);
+        color: var(--accent-1);
+    }
+
+    /* ── Alerts ── */
+    .stAlert, .stError, .stWarning, .stSuccess, .stInfo {
+        border-radius: 8px !important;
+        border-width: 1px !important;
+        font-family: var(--font-sans) !important;
+    }
+    .stAlert {
+        background: var(--bg-card) !important;
+        border-color: var(--border) !important;
+        color: var(--text-secondary) !important;
+    }
+    .stError {
+        background: var(--danger-bg) !important;
+        border-color: var(--danger-border) !important;
+        color: var(--danger) !important;
+    }
+    .stSuccess {
+        background: var(--success-bg) !important;
+        border-color: var(--success-border) !important;
+        color: var(--success) !important;
+    }
+    .stWarning {
+        background: var(--warning-bg) !important;
+        border-color: rgba(255,181,69,0.2) !important;
+        color: var(--warning) !important;
+    }
+    .stInfo {
+        background: var(--glow-purple) !important;
+        border-color: rgba(124,92,252,0.2) !important;
+        color: var(--accent-1) !important;
+    }
+
+    /* ── Spinner ── */
+    .stSpinner > div {
+        border-color: var(--accent-1) !important;
+        border-top-color: transparent !important;
+    }
+
+    /* ── Loading ── */
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        gap: 1rem;
+    }
+    .loading-spinner {
+        width: 32px; height: 32px;
+        border: 2px solid rgba(124,92,252,0.15);
+        border-top: 2px solid var(--accent-1);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+    }
+
+    /* ── Stats in sidebar ── */
     .stat-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 8px;
+        gap: 6px;
     }
-    .stat-item {
+    .stat-box {
+        padding: 0.6rem;
         text-align: center;
-        padding: 0.6rem 0.3rem;
         border: 1px solid var(--border);
-        background: rgba(255,255,255,0.02);
+        border-radius: 6px;
+        background: rgba(255,255,255,0.015);
     }
-    .stat-item .val {
+    .stat-box .val {
         font-family: var(--font-mono);
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         font-weight: 500;
-        color: var(--accent);
+        color: var(--accent-1);
     }
-    .stat-item .lbl {
-        font-size: 0.6rem;
-        color: var(--text-dim);
+    .stat-box .lbl {
+        font-size: 0.55rem;
+        color: var(--text-muted);
         text-transform: uppercase;
         letter-spacing: 1.5px;
-        margin-top: 0.2rem;
+        margin-top: 0.15rem;
     }
 
-    /* ── Robustness Result ── */
-    .rob-result {
+    /* ── Result item ── */
+    .result-line {
+        padding: 0.7rem 1rem;
         border: 1px solid var(--border);
-        padding: 0.8rem 1rem;
-        margin: 0.4rem 0;
-        color: var(--text-muted);
-        font-size: 0.9rem;
-        background: rgba(255,255,255,0.015);
+        border-radius: 6px;
+        margin: 0.35rem 0;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        background: rgba(255,255,255,0.01);
     }
-    .rob-result strong {
-        color: var(--text);
-    }
+    .result-line strong { color: var(--text); }
 
     /* ── History ── */
-    .hist-item {
-        border: 1px solid var(--border);
+    .hist-card {
         padding: 0.75rem;
         text-align: center;
-        transition: all 0.25s ease;
-        background: rgba(255,255,255,0.015);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.01);
+        transition: all 0.2s ease;
     }
-    .hist-item:hover {
+    .hist-card:hover {
         border-color: var(--border-light);
         background: var(--bg-card-hover);
     }
@@ -519,115 +582,36 @@ CUSTOM_CSS = """
         margin-top: 0.4rem;
     }
 
+    /* ── Preview label ── */
+    .preview-lbl {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        text-align: center;
+        margin-bottom: 0.4rem;
+    }
+
     /* ── Footer ── */
     .footer {
         text-align: center;
         padding: 1.5rem;
-        color: var(--text-dim);
-        font-size: 0.75rem;
-        border-top: 1px solid var(--border);
-        margin-top: 2.5rem;
-        font-family: var(--font-mono);
-        letter-spacing: 0.5px;
-    }
-    .footer strong {
         color: var(--text-muted);
-        font-weight: 500;
-    }
-
-    /* ── Loading ── */
-    .loading-dots {
-        display: inline-block;
-    }
-    .loading-dots::after {
-        content: '';
-        animation: dots 1.2s steps(4, end) infinite;
-    }
-    @keyframes dots {
-        0% { content: ''; }
-        25% { content: '.'; }
-        50% { content: '..'; }
-        75% { content: '...'; }
-        100% { content: ''; }
-    }
-    .loading-text {
-        color: var(--text-dim);
+        font-size: 0.7rem;
+        border-top: 1px solid var(--border);
+        margin-top: 3rem;
         font-family: var(--font-mono);
-        font-size: 0.85rem;
     }
-
-    /* ── Alerts / Messages ── */
-    .stAlert, .stError, .stWarning, .stSuccess, .stInfo {
-        border-radius: 0 !important;
-        border-width: 1px !important;
-        font-family: var(--font-sans) !important;
-    }
-    .stAlert {
-        background: rgba(255,255,255,0.02) !important;
-        border-color: var(--border) !important;
-        color: var(--text-muted) !important;
-    }
-    .stError {
-        background: var(--red-glow) !important;
-        border-color: var(--red-border) !important;
-        color: var(--red) !important;
-    }
-    .stSuccess {
-        background: var(--green-glow) !important;
-        border-color: var(--green-border) !important;
-        color: var(--green) !important;
-    }
-    .stWarning {
-        background: rgba(200, 160, 106, 0.08) !important;
-        border-color: rgba(200, 160, 106, 0.2) !important;
-        color: var(--amber) !important;
-    }
-    .stInfo {
-        background: var(--accent-glow) !important;
-        border-color: var(--accent-border) !important;
-        color: var(--accent) !important;
-    }
-
-    /* ── Spinner ── */
-    .stSpinner > div {
-        border-color: var(--accent) !important;
-        border-top-color: transparent !important;
-    }
-
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border-light); }
-    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
-
-    /* ── Preview label ── */
-    .preview-label {
-        font-family: var(--font-mono);
-        font-size: 0.65rem;
-        color: var(--text-dim);
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        text-align: center;
-        margin-bottom: 0.5rem;
-    }
-
-    /* ── Sub section title ── */
-    .sub-title {
-        font-family: var(--font-serif);
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--text);
-        margin: 1.5rem 0 0.75rem;
-    }
+    .footer strong { color: var(--text-secondary); font-weight: 500; }
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
         .hero-title { font-size: 2rem; }
-        .hero { padding: 2rem 1rem; }
-        .result-card .label { font-size: 1.5rem; }
-        .result-card .icon { font-size: 2.5rem; }
+        .header { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+        .result-label { font-size: 1.5rem; }
         .gauge-ring { width: 100px; height: 100px; }
-        .gauge-val { font-size: 1.3rem; }
+        .gauge-val { font-size: 1.2rem; }
     }
 </style>
 """
@@ -649,24 +633,17 @@ def load_model() -> Tuple[nn.Module, GradCAM]:
         logger.info(f"Modelo cargado desde: {checkpoint_path}")
         st.sidebar.success(f"Modelo cargado: {checkpoint_path.name}")
     else:
-        logger.warning("No se encontró checkpoint. Usando pesos pre-entrenados sin fine-tuning.")
-        st.sidebar.warning(
-            "No se encontró modelo entrenado. "
-            "Usando pesos pre-entrenados de ImageNet. "
-            "Los resultados serán subóptimos."
-        )
+        logger.warning("Usando pesos pre-entrenados sin fine-tuning.")
+        st.sidebar.warning("Usando pesos ImageNet. Resultados suboptimos.")
     model.to(DEVICE)
     model.eval()
     gradcam = GradCAM(model)
     return model, gradcam
 
 
-# ─── Funciones de procesamiento ──────────────────────────────────────────────
+# ─── Funciones ───────────────────────────────────────────────────────────────
 
-def predict_image(
-    model: nn.Module,
-    image: Image.Image,
-) -> Tuple[int, float, torch.Tensor]:
+def predict_image(model: nn.Module, image: Image.Image) -> Tuple[int, float, torch.Tensor]:
     input_tensor = preprocess_image(image).to(DEVICE)
     with torch.no_grad():
         outputs = model(input_tensor)
@@ -683,73 +660,80 @@ def compress_image(image: Image.Image, quality: int) -> Image.Image:
 
 
 def get_compression_info(quality: int) -> str:
-    if quality >= 95:
-        return "Sin compresion apreciable"
-    elif quality >= 75:
-        return "Compresion moderada"
-    elif quality >= 50:
-        return "Compresion agresiva"
-    else:
-        return "Compresion muy agresiva"
+    if quality >= 95: return "Sin compresion apreciable"
+    elif quality >= 75: return "Compresion moderada"
+    elif quality >= 50: return "Compresion agresiva"
+    else: return "Compresion muy agresiva"
 
 
 def render_gauge(pct: float, color: str) -> str:
-    r = 52
+    r = 48
     c = 2 * 3.14159 * r
     offset = c * (1 - pct / 100)
     return f"""
     <div class="gauge-ring">
-        <svg width="130" height="130" viewBox="0 0 130 130">
-            <circle class="track" cx="65" cy="65" r="{r}"/>
-            <circle class="fill" cx="65" cy="65" r="{r}"
+        <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle class="gauge-track" cx="60" cy="60" r="{r}"/>
+            <circle class="gauge-fill" cx="60" cy="60" r="{r}"
                     stroke="{color}" stroke-dasharray="{c}" stroke-dashoffset="{offset}"/>
         </svg>
-        <div class="gauge-val" style="color: {color}">{pct:.1f}%</div>
+        <div class="gauge-val" style="color:{color}">{pct:.1f}%</div>
     </div>
     """
 
 
-# ─── Estado de sesion ─────────────────────────────────────────────────────────
+# ─── Estado ──────────────────────────────────────────────────────────────────
 
 if "history" not in st.session_state:
     st.session_state.history = []
-if "robustness_results" not in st.session_state:
-    st.session_state.robustness_results = None
 if "current_result" not in st.session_state:
     st.session_state.current_result = None
+if "robustness_results" not in st.session_state:
+    st.session_state.robustness_results = None
 
 
-# ─── Interfaz ────────────────────────────────────────────────────────────────
+# ─── UI Principal ────────────────────────────────────────────────────────────
 
 def main():
     # ── Sidebar ──
     with st.sidebar:
         st.markdown(
-            '<div style="text-align:center;padding:1.5rem 0 0.5rem;">'
-            '<span style="font-size:2rem;">\U0001F50D</span>'
-            '<p class="sidebar-title">DeepFake Detector</p>'
-            '<p class="sidebar-sub">Forensic Analysis</p>'
+            '<div style="text-align:center;padding:1.5rem 0.5rem 0.5rem;">'
+            '<div style="width:44px;height:44px;margin:0 auto 0.75rem;'
+            'background:var(--accent-gradient);border-radius:12px;'
+            'display:flex;align-items:center;justify-content:center;font-size:1.4rem;">'
+            '\U0001F50D</div>'
+            '<p style="font-weight:700;color:var(--text);margin:0;font-size:1.05rem;">'
+            'DeepFake Detector</p>'
+            '<p style="font-size:0.65rem;color:var(--text-muted);font-family:var(--font-mono);'
+            'text-transform:uppercase;letter-spacing:1.5px;margin-top:0.2rem;">'
+            'Forensic Analysis</p>'
             '</div>',
             unsafe_allow_html=True,
         )
         st.markdown("---")
         st.markdown(
-            '<p class="sidebar-heading">Protocolo</p>'
-            '<ol class="sidebar-ol">'
-            '<li>Cargar una imagen facial</li>'
-            '<li>Ejecutar el analisis</li>'
-            '<li>Revisar prediccion y Activacion</li>'
-            '</ol>'
-            '<p class="sidebar-text" style="margin-top:0.75rem;">'
-            'Arquitectura: <b>DenseNet-121</b> con <b>Grad-CAM</b> '
-            'para mapas de activacion.</p>',
+            '<p style="font-size:0.8rem;font-weight:600;color:var(--text);margin:0 0 0.5rem;">'
+            'Como funciona</p>'
+            '<ol style="color:var(--text-secondary);font-size:0.8rem;line-height:1.9;'
+            'padding-left:1rem;margin:0;">'
+            '<li>Carga una imagen facial</li>'
+            '<li>Ejecuta el analisis</li>'
+            '<li>Revisa la prediccion y activacion</li>'
+            '</ol>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.75rem;line-height:1.6;">'
+            'Modelo: <strong style="color:var(--accent-1);">DenseNet-121</strong><br>'
+            'Explicabilidad: <strong style="color:var(--accent-1);">Grad-CAM</strong></p>',
             unsafe_allow_html=True,
         )
         st.markdown("---")
         st.markdown(
             f'<div class="stat-grid">'
-            f'<div class="stat-item"><div class="val">{DEVICE.upper()}</div><div class="lbl">Dispositivo</div></div>'
-            f'<div class="stat-item"><div class="val">{IMG_SIZE}x{IMG_SIZE}</div><div class="lbl">Entrada</div></div>'
+            f'<div class="stat-box"><div class="val">{DEVICE.upper()}</div><div class="lbl">Dispositivo</div></div>'
+            f'<div class="stat-box"><div class="val">{IMG_SIZE}x{IMG_SIZE}</div><div class="lbl">Entrada</div></div>'
             f'</div>',
             unsafe_allow_html=True,
         )
@@ -757,8 +741,9 @@ def main():
     # ── Cargar modelo ──
     loading = st.empty()
     loading.markdown(
-        '<div style="text-align:center;padding:3rem;">'
-        '<p class="loading-text">Inicializando modelo<span class="loading-dots"></span></p>'
+        '<div class="loading-container">'
+        '<div class="loading-spinner"></div>'
+        '<div class="loading-text">Inicializando modelo...</div>'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -772,28 +757,47 @@ def main():
         model_ready = False
         gradcam = None
 
+    # ── Header ──
+    st.markdown(
+        '<div class="header">'
+        '<div class="header-left">'
+        '<div class="header-logo">\U0001F50D</div>'
+        '<div>'
+        '<p class="header-title">DeepFake Detector</p>'
+        '<p class="header-sub">Computer Vision &bull; Deep Learning</p>'
+        '</div>'
+        '</div>'
+        '<div class="header-status">'
+        '<div class="status-dot"></div>'
+        '<span class="status-text">Sistema activo</span>'
+        '</div>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
     # ── Hero ──
     st.markdown(
         '<div class="hero">'
-        '<p class="hero-label">Computer Vision &bull; Deep Learning</p>'
-        '<h1 class="hero-title">Detector de<br><em>DeepFakes</em></h1>'
+        '<div class="hero-glow"></div>'
+        '<div class="hero-badge">'
+        '\U0001F52C Inteligencia Artificial en accion</div>'
+        '<h1 class="hero-title">Deteccion de<br><span>DeepFakes</span></h1>'
         '<p class="hero-sub">'
-        'Determine si una imagen facial es <strong>autentica</strong> o '
-        '<strong>generada por inteligencia artificial</strong> '
-        'mediante analisis espectral con mapas de activacion.</p>'
+        'Determina si una imagen facial es <strong>autentica</strong> o ha sido '
+        '<strong>generada por IA</strong> mediante analisis profundo '
+        'con mapas de activacion.</p>'
         '</div>',
         unsafe_allow_html=True,
     )
 
     # ── Upload ──
     uploaded_file = st.file_uploader(
-        "Cargar imagen facial",
+        "Arrastra una imagen facial aqui",
         type=["jpg", "jpeg", "png"],
         help="Formatos: JPG, JPEG, PNG",
     )
 
     col_btn, col_preview = st.columns([3, 2])
-
     with col_btn:
         analyze = st.button(
             "Ejecutar Analisis",
@@ -805,16 +809,16 @@ def main():
     # ── Procesar ──
     if uploaded_file is not None:
         image = Image.open(uploaded_file).convert("RGB")
-
         with col_preview:
-            st.markdown('<p class="preview-label">Vista previa</p>', unsafe_allow_html=True)
+            st.markdown('<p class="preview-lbl">Previsualizacion</p>', unsafe_allow_html=True)
             st.image(image, width=200)
 
         if analyze:
             analyzing = st.empty()
             analyzing.markdown(
-                '<div style="text-align:center;padding:2rem;">'
-                '<p class="loading-text">Procesando<span class="loading-dots"></span></p>'
+                '<div class="loading-container">'
+                '<div class="loading-spinner"></div>'
+                '<div class="loading-text">Analizando imagen...</div>'
                 '</div>',
                 unsafe_allow_html=True,
             )
@@ -841,7 +845,6 @@ def main():
                 })
                 if len(st.session_state.history) > MAX_HISTORY:
                     st.session_state.history = st.session_state.history[-MAX_HISTORY:]
-
                 analyzing.empty()
             except Exception as e:
                 analyzing.empty()
@@ -852,60 +855,72 @@ def main():
     if st.session_state.current_result is not None:
         res = st.session_state.current_result
         is_fake = res["class_idx"] == 0
-        color = "#C2514A" if is_fake else "#6B9F71"
-        icon = "\u2718" if is_fake else "\u2714"
         cls = "fake" if is_fake else "real"
+        color = "#FF6B6B" if is_fake else "#2ED47A"
+        icon = "\u2718" if is_fake else "\u2714"
 
-        st.markdown('<p class="sec-title">Dictamen</p>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="sec-title">'
+            '<div class="sec-title-dot"></div>'
+            'Resultados del Analisis'
+            '</div>',
+            unsafe_allow_html=True,
+        )
 
-        col1, col2, col3 = st.columns(3)
+        c1, c2, c3 = st.columns(3)
 
-        with col1:
+        with c1:
             st.markdown(
                 f'<div class="result-card {cls}">'
-                f'<span class="icon">{icon}</span>'
-                f'<p class="label {cls}">{res["class_name"]}</p>'
-                f'<p class="sub">Prediccion</p>'
+                f'<div class="result-icon">{icon}</div>'
+                f'<p class="result-label {cls}">{res["class_name"]}</p>'
+                f'<p class="result-sub">Prediccion</p>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
 
-        with col2:
-            conf_pct = res["confidence"] * 100
-            gc = "#C2514A" if conf_pct < 70 else "#C8A06A" if conf_pct < 90 else "#6B9F71"
+        with c2:
+            conf = res["confidence"] * 100
+            gc = "#FF6B6B" if conf < 70 else "#FFB545" if conf < 90 else "#2ED47A"
             st.markdown(
                 f'<div class="card gauge-wrap">'
-                + render_gauge(conf_pct, gc) +
+                + render_gauge(conf, gc) +
                 '<p class="gauge-label">Confianza</p>'
                 '</div>',
                 unsafe_allow_html=True,
             )
 
-        with col3:
+        with c3:
             score = torch.softmax(res["logits"], dim=1)[0][1].item()
-            emoji_icon = "\U0001F916" if is_fake else "\U0001F464"
+            ic = "\U0001F916" if is_fake else "\U0001F464"
             st.markdown(
-                f'<div class="card score-box">'
-                f'<div class="emoji-icon">{emoji_icon}</div>'
-                f'<div class="value">{score:.4f}</div>'
-                f'<div class="label">Score Real</div>'
-                f'<div class="score-track">'
-                f'<div class="ticks"><span>0.0000</span><span>1.0000</span></div>'
-                f'<div class="bar"><div class="bar-fill" style="width:{score*100}%"></div></div>'
-                f'</div>'
-                f'</div>',
+                f'<div class="card score-wrap">'
+                f'<div class="score-icon">{ic}</div>'
+                f'<div class="score-num">{score:.4f}</div>'
+                f'<div class="score-lbl">Score Real</div>'
+                f'<div class="score-bar">'
+                f'<div class="score-bar-labels"><span>0</span><span>1</span></div>'
+                f'<div class="score-bar-track">'
+                f'<div class="score-bar-fill" style="width:{score*100}%"></div>'
+                f'</div></div></div>',
                 unsafe_allow_html=True,
             )
 
-        # ── Heatmap + Explanation ──
-        st.markdown('<p class="sec-title">Activacion del Modelo</p>', unsafe_allow_html=True)
+        # ── Heatmap + Explanacion ──
+        st.markdown(
+            '<div class="sec-title">'
+            '<div class="sec-title-dot"></div>'
+            'Activacion del Modelo'
+            '</div>',
+            unsafe_allow_html=True,
+        )
 
         hcol, ecol = st.columns(2)
 
         with hcol:
             st.markdown(
                 '<div class="card">'
-                '<p class="card-title">Mapa de Activacion Grad-CAM</p>',
+                '<p class="card-title">\U0001F3AF Grad-CAM</p>',
                 unsafe_allow_html=True,
             )
             st.image(res["overlay"], caption="Regiones de mayor influencia en la decision",
@@ -918,77 +933,81 @@ def main():
                 '</div>',
                 unsafe_allow_html=True,
             )
-            st.markdown(
-                '<p class="sub-title" style="font-size:0.9rem;margin-top:1.5rem;">'
-                'Activacion pura</p>',
-                unsafe_allow_html=True,
-            )
             hd = (res["heatmap_raw"] * 255).astype(np.uint8)
             hp = Image.fromarray(hd, mode="L").resize((224, 224))
-            st.image(hp, width=140)
+            st.markdown(
+                '<p style="font-size:0.8rem;color:var(--text-muted);margin:1rem 0 0.5rem;'
+                'font-family:var(--font-mono);">Activacion pura</p>',
+                unsafe_allow_html=True,
+            )
+            st.image(hp, width=130)
             st.markdown('</div>', unsafe_allow_html=True)
 
         with ecol:
             st.markdown(
                 f'<div class="card">'
-                f'<p class="card-title">Informe</p>'
+                f'<p class="card-title">\U0001F4DD Informe</p>'
                 f'<div class="explain-box">{res["explanation"]}</div>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
 
         # ── Robustez ──
-        st.markdown('<p class="sec-title">Pruebas de Robustez</p>', unsafe_allow_html=True)
         st.markdown(
-            '<p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem;">'
-            'Efecto de la compresion JPEG en la prediccion.</p>',
+            '<div class="sec-title">'
+            '<div class="sec-title-dot"></div>'
+            'Pruebas de Robustez'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.75rem;">'
+            'Evalua el impacto de la compresion JPEG en la prediccion.</p>',
             unsafe_allow_html=True,
         )
 
-        r1, r2, r3 = st.columns(3)
-        with r1:
-            b100 = st.button("QF 100  Maxima", use_container_width=True, key="qf100")
-        with r2:
-            b75 = st.button("QF 75  Media", use_container_width=True, key="qf75")
-        with r3:
-            b50 = st.button("QF 50  Baja", use_container_width=True, key="qf50")
+        rb1, rb2, rb3 = st.columns(3)
+        with rb1: b100 = st.button("QF 100  Maxima calidad", use_container_width=True, key="qf100")
+        with rb2: b75 = st.button("QF 75  Calidad media", use_container_width=True, key="qf75")
+        with rb3: b50 = st.button("QF 50  Calidad baja", use_container_width=True, key="qf50")
 
-        rob_results = []
+        rob_res = []
         for qf, btn in [(100, b100), (75, b75), (50, b50)]:
             if btn:
                 comp = compress_image(res["image"], qf)
                 cidx, cconf, _ = predict_image(model, comp)
                 cname = CLASS_NAMES[cidx]
-                rob_results.append({"qf": qf, "class_name": cname, "confidence": cconf, "image": comp})
+                rob_res.append({"qf": qf, "class_name": cname, "confidence": cconf, "image": comp})
                 rm = "\u2718" if cname == "FAKE" else "\u2714"
                 st.markdown(
-                    f'<div class="rob-result">'
+                    f'<div class="result-line">'
                     f'<b>QF {qf}</b> &mdash; {get_compression_info(qf)}: '
                     f'{rm} <b>{cname}</b> con <b>{cconf*100:.1f}%</b></div>',
                     unsafe_allow_html=True,
                 )
 
-        if rob_results:
-            st.session_state.robustness_results = rob_results
+        if rob_res:
+            st.session_state.robustness_results = rob_res
             st.markdown(
-                '<p class="sub-title">Comparativa</p>',
+                '<p style="font-size:0.9rem;font-weight:600;color:var(--text);margin:1rem 0 0.75rem;">'
+                'Comparativa visual</p>',
                 unsafe_allow_html=True,
             )
-            cols = st.columns(len(rob_results))
-            for i, rr in enumerate(rob_results):
+            cols = st.columns(len(rob_res))
+            for i, rr in enumerate(rob_res):
                 with cols[i]:
-                    rf = rr["class_name"] == "FAKE"
-                    rc = "#C2514A" if rf else "#6B9F71"
-                    rico = "\u2718" if rf else "\u2714"
+                    rf2 = rr["class_name"] == "FAKE"
+                    rc2 = "#FF6B6B" if rf2 else "#2ED47A"
+                    ric2 = "\u2718" if rf2 else "\u2714"
                     st.markdown(
-                        f'<div class="card" style="text-align:center;padding:1rem;">',
+                        '<div class="card" style="text-align:center;padding:1rem;">',
                         unsafe_allow_html=True,
                     )
                     st.image(rr["image"], caption=f"QF {rr['qf']}", use_container_width=True)
                     st.markdown(
-                        f'<p style="font-weight:600;color:{rc};margin:0.5rem 0 0;'
-                        f'font-size:1rem;">{rico} {rr["class_name"]}</p>'
-                        f'<p style="color:var(--text-dim);font-size:0.85rem;margin:0;">'
+                        f'<p style="font-weight:600;color:{rc2};margin:0.5rem 0 0;'
+                        f'font-size:1rem;">{ric2} {rr["class_name"]}</p>'
+                        f'<p style="color:var(--text-muted);font-size:0.8rem;margin:0;">'
                         f'{rr["confidence"]*100:.1f}%</p>',
                         unsafe_allow_html=True,
                     )
@@ -996,23 +1015,27 @@ def main():
 
     # ── Historial ──
     if st.session_state.history:
-        st.markdown('<p class="sec-title">Historial</p>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="sec-title">'
+            '<div class="sec-title-dot"></div>'
+            'Historial'
+            '</div>',
+            unsafe_allow_html=True,
+        )
         cols = st.columns(min(len(st.session_state.history), MAX_HISTORY))
         for i, entry in enumerate(reversed(st.session_state.history[:MAX_HISTORY])):
             with cols[i]:
                 himg = base64_to_image(entry["image_b64"])
                 hf = entry["class_name"] == "FAKE"
-                hc = "#C2514A" if hf else "#6B9F71"
+                hc = "#FF6B6B" if hf else "#2ED47A"
                 hico = "\u2718" if hf else "\u2714"
-                st.markdown(
-                    '<div class="hist-item">',
-                    unsafe_allow_html=True,
-                )
+                st.markdown('<div class="hist-card">', unsafe_allow_html=True)
                 st.image(himg, width=90)
                 st.markdown(
                     f'<p class="hist-label" style="color:{hc};">'
                     f'{hico} {entry["class_name"]}<br>'
-                    f'<span style="font-size:0.7rem;color:var(--text-dim);">'
+                    f'<span style="font-size:0.65rem;color:var(--text-muted);'
+                    f'font-family:var(--font-mono);">'
                     f'{entry["confidence"]*100:.1f}%</span></p>',
                     unsafe_allow_html=True,
                 )
@@ -1021,19 +1044,15 @@ def main():
     # ── Footer ──
     st.markdown(
         '<div class="footer">'
-        '<strong>DeepFake Detector</strong> &nbsp;&middot;&nbsp; '
-        'DenseNet-121 &nbsp;&middot;&nbsp; '
+        '<strong>DeepFake Detector</strong> &nbsp;&#183;&nbsp; '
+        'DenseNet-121 &nbsp;&#183;&nbsp; '
         'Dataset 140K Real and Fake Faces'
         '</div>',
         unsafe_allow_html=True,
     )
 
     if not model_ready:
-        st.error(
-            "No se pudo cargar el modelo.\n\n"
-            "Entrene el modelo primero ejecutando:\n"
-            "```bash\npython -m src.train\n```"
-        )
+        st.error("No se pudo cargar el modelo. Entrenelo primero ejecutando: python -m src.train")
 
 
 if __name__ == "__main__":
