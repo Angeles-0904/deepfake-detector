@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+env/
+.venv/
+.venv*/
+
+# Data (large dataset ~5GB)
+data/
+!data/.gitkeep
+
+# Models and checkpoints
+models/
+outputs/checkpoints/
+outputs/plots/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Environment
+.env
+
+# Windows reserved names and artifacts
+nul
+nul
+
+# Streamlit config
+.streamlit/
+!.streamlit/config.toml

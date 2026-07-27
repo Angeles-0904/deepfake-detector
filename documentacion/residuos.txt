@@ -1,0 +1,39 @@
+BUSCANDO TEXTO RESIDUAL DEL TEMPLATE ORIGINAL...
+
+[0] (Normal) -> CLASIFICACIÓN DE URLS MALICIOSAS UTILIZANDO TABTRANSFORMER PARA LA DETECCIÓN DE ATAQUES DE PHISHING
+
+[5] (Normal) -> ▪ Examinar las variables disponibles en el conjunto de datos Malicious URL Detection Dataset Enhanced 2026, identificando las características léxicas y estructurales más relevantes para diferenciar entre URL maliciosas y legítimas asociadas a ataques
+
+[6] (Normal) -> ▪ Elaborar la configuración del modelo TabTransformer, definiendo el tratamiento de las variables categóricas y numéricas, la cantidad de capas de atención y los demás parámetros necesarios para su aplicación a la clasificación de URL maliciosas.
+
+[7] (Normal) -> ▪ Desarrollar el proceso de entrenamiento del modelo TabTransformer utilizando el conjunto de datos preprocesado, aplicando las técnicas de codificación, normalización y balanceo de clases descritas en el marco teórico.
+
+[8] (Normal) -> ▪ Medir el desempeño del modelo TabTransformer entrenado a partir de las métricas de exactitud, precisión, sensibilidad, puntaje F1 y área bajo la curva ROC, con el fin de determinar su capacidad para detectar URL asociadas a ataques de phishing.
+
+[9] (Normal) -> ▪ Contrastar los resultados alcanzados por el modelo TabTransformer con los valores reportados en los antecedentes de investigación revisados, con el propósito de situar el aporte del presente trabajo dentro del estado actual del conocimiento sobre d
+
+[13] (Normal) -> Examinar las variables disponibles en el conjunto de datos Malicious URL Detection Dataset Enhanced 2026, identificando las características léxicas y estructurales más relevantes para diferenciar entre URLs maliciosas y legítimas asociadas a ataques 
+
+[16] (Normal) -> Conocer la estructura del conjunto de datos, evaluar su calidad e identificar las variables que aportan mayor información para reconocer URLs de phishing.
+
+[158] (Normal) -> Elaborar la configuración del modelo TabTransformer, definiendo el tratamiento de las variables categóricas y numéricas, la cantidad de capas de atención y los demás parámetros necesarios para su aplicación a la clasificación de URLs maliciosas.
+
+[162] (Normal) -> El archivo explica que TabTransformer convierte las variables categóricas en embeddings, las procesa mediante bloques Transformer y luego las combina con variables numéricas para realizar la clasificación final.
+
+[265] (Normal) -> TabTransformer.
+
+[292] (Normal) -> Desarrollar el proceso de entrenamiento del modelo TabTransformer utilizando el conjunto de datos preprocesado, aplicando técnicas de codificación, normalización y balanceo de clases.
+
+[295] (Normal) -> Preparar los datos y entrenar el modelo para que aprenda a diferenciar URLs legítimas de URLs relacionadas con ataques de phishing.
+
+[447] (Normal) -> Medir el desempeño del modelo TabTransformer entrenado a partir de las métricas de exactitud, precisión, sensibilidad, puntaje F1 y área bajo la curva ROC, con el fin de determinar su capacidad para detectar URLs asociadas a ataques de phishing.
+
+[450] (Normal) -> Determinar objetivamente si el modelo identifica correctamente las URLs de phishing y si mantiene un nivel aceptable de errores.
+
+[566] (Normal) -> Contrastar los resultados alcanzados por el modelo TabTransformer con los valores reportados en los antecedentes de investigación revisados, con el propósito de situar el aporte del presente trabajo dentro del estado actual del conocimiento sobre det
+
+[569] (Normal) -> Esta fase permite cumplir directamente el objetivo general, porque con los resultados obtenidos se determinará la eficacia real del modelo TabTransformer.
+
+[670] (Normal) -> TabTransformer.
+
+=== BUSQUEDA COMPLETADA ===

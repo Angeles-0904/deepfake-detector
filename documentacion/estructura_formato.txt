@@ -1,0 +1,542 @@
+Total parrafos: 642
+
+[0] Normal: CLASIFICACIÓN DE URLS MALICIOSAS UTILIZANDO TABTRANSFORMER PARA LA DETECCIÓN DE ATAQUES DE PHISHING
+[2] Normal: Determinar la eficacia del modelo TabTransformer en la clasificación de URL maliciosas para la detección de ataques de phishing, mediante su implementación y evaluación sobre el conjunto de datos Malicious URL Detection Dataset Enhanced 2026. 
+[4] Normal: 3.2. Objetivos específicos 
+[5] Normal: ▪ Examinar las variables disponibles en el conjunto de datos Malicious URL Detection Dataset Enhanced 2026, identificando las características léxicas y estructurales más relevantes para diferenciar entre URL maliciosas y legítimas asociadas a ataques de phishing. 
+[6] Normal: ▪ Elaborar la configuración del modelo TabTransformer, definiendo el tratamiento de las variables categóricas y numéricas, la cantidad de capas de atención y los demás parámetros necesarios para su aplicación a la clasificación de URL maliciosas. 
+[7] Normal: ▪ Desarrollar el proceso de entrenamiento del modelo TabTransformer utilizando el conjunto de datos preprocesado, aplicando las técnicas de codificación, normalización y balanceo de clases descritas en el marco teórico. 
+[8] Normal: ▪ Medir el desempeño del modelo TabTransformer entrenado a partir de las métricas de exactitud, precisión, sensibilidad, puntaje F1 y área bajo la curva ROC, con el fin de determinar su capacidad para detectar URL asociadas a ataques de phishing. 
+[9] Normal: ▪ Contrastar los resultados alcanzados por el modelo TabTransformer con los valores reportados en los antecedentes de investigación revisados, con el propósito de situar el aporte del presente trabajo dentro del estado actual del conocimiento sobre detección de URL maliciosas.
+[11] Normal: FASE 1. ANÁLISIS Y SELECCIÓN DE LAS CARACTERÍSTICAS DEL CONJUNTO DE DATOS
+[12] Normal: Objetivo específico relacionado
+[13] Normal: Examinar las variables disponibles en el conjunto de datos Malicious URL Detection Dataset Enhanced 2026, identificando las características léxicas y estructurales más relevantes para diferenciar entre URLs maliciosas y legítimas asociadas a ataques de phishing.
+[15] Normal: Propósito de la fase
+[16] Normal: Conocer la estructura del conjunto de datos, evaluar su calidad e identificar las variables que aportan mayor información para reconocer URLs de phishing.
+[18] Normal: Actividades y pasos detallados
+[20] Normal: Paso 1. Obtener el conjunto de datos
+[21] Normal: Se descargará el conjunto de datos Malicious URL Detection Dataset Enhanced 2026 desde la plataforma Kaggle.
+[22] Normal: Se verificará:
+[23] Normal: Formato del archivo. 
+[24] Normal: Tamaño del conjunto de datos. 
+[25] Normal: Número de filas. 
+[26] Normal: Número de columnas. 
+[27] Normal: Nombre de la variable objetivo. 
+[28] Normal: Clases disponibles. 
+[29] Normal: Descripción de las variables. 
+[31] Normal: Paso 2. Configurar el entorno de trabajo
+[32] Normal: Se utilizará:
+[33] Normal: Google Colab o Jupyter Notebook. 
+[34] Normal: Python. 
+[35] Normal: Pandas. 
+[36] Normal: NumPy. 
+[37] Normal: Matplotlib. 
+[38] Normal: Scikit-learn. 
+[40] Normal: Paso 3. Cargar el conjunto de datos
+[41] Normal: import pandas as pd
+[42] Normal: df = pd.read_csv("malicious_url_dataset.csv")
+[43] Normal: print(df.shape)
+[44] Normal: print(df.head())
+[45] Normal: print(df.info())
+[47] Normal: Paso 4. Elaborar el diccionario de datos
+[48] Normal: Para cada variable se registrará:
+[49] Normal: Nombre. 
+[50] Normal: Descripción. 
+[51] Normal: Tipo de dato. 
+[52] Normal: Valores posibles. 
+[53] Normal: Número de valores faltantes. 
+[54] Normal: Función dentro del modelo. 
+[55] Normal: Ejemplo:
+[57] Normal: Paso 5. Limpiar el conjunto de datos
+[58] Normal: Se aplicarán los siguientes procedimientos:
+[59] Normal: Eliminación de registros duplicados. 
+[60] Normal: Identificación de URLs vacías. 
+[61] Normal: Corrección de valores inconsistentes. 
+[62] Normal: Tratamiento de valores nulos. 
+[63] Normal: Eliminación de registros sin etiqueta. 
+[64] Normal: Revisión de URLs repetidas con clases diferentes. 
+[65] Normal: Conversión de variables al tipo correcto. 
+[67] Normal: Paso 6. Realizar el análisis exploratorio
+[68] Normal: Se calcularán:
+[69] Normal: Frecuencias de las clases. 
+[70] Normal: Media. 
+[71] Normal: Mediana. 
+[72] Normal: Desviación estándar. 
+[73] Normal: Valores mínimos y máximos. 
+[74] Normal: Distribución de las variables. 
+[75] Normal: Cantidad de valores atípicos. 
+[76] Normal: Balance entre URLs legítimas y de phishing. 
+[77] Normal: Paso 7. Examinar características léxicas
+[78] Normal: Se analizarán variables obtenidas directamente de la URL, como:
+[79] Normal: Longitud total. 
+[80] Normal: Número de puntos. 
+[81] Normal: Número de guiones. 
+[82] Normal: Número de barras. 
+[83] Normal: Cantidad de dígitos. 
+[84] Normal: Cantidad de caracteres especiales. 
+[85] Normal: Presencia del símbolo @. 
+[86] Normal: Presencia de %. 
+[87] Normal: Uso de una dirección IP. 
+[88] Normal: Cantidad de subdominios. 
+[89] Normal: Uso de palabras sospechosas. 
+[90] Normal: Presencia de HTTPS. 
+[92] Normal: Paso 8. Examinar características estructurales
+[93] Normal: Se analizarán:
+[94] Normal: Protocolo. 
+[95] Normal: Dominio principal. 
+[96] Normal: Subdominio. 
+[97] Normal: Dominio de nivel superior. 
+[98] Normal: Ruta. 
+[99] Normal: Parámetros de consulta. 
+[100] Normal: Fragmentos. 
+[101] Normal: Longitud del host. 
+[102] Normal: Longitud del dominio. 
+[103] Normal: Número de directorios. 
+[105] Normal: Paso 9. Aplicar técnicas de selección de características
+[106] Normal: Se utilizarán:
+[107] Normal: Correlación de Pearson o Spearman. 
+[108] Normal: Prueba ANOVA. 
+[109] Normal: Prueba chi-cuadrado. 
+[110] Normal: Información mutua. 
+[111] Normal: Importancia de variables mediante Random Forest. 
+[112] Normal: Estas técnicas permitirán identificar las variables con mayor capacidad para diferenciar URLs legítimas y maliciosas. En uno de los antecedentes incluidos en el documento, ANOVA, chi-cuadrado y correlación fueron utilizados para reducir 39 variables a 15 características relevantes. 
+[114] Normal: Paso 10. Seleccionar las variables definitivas
+[115] Normal: Las variables serán conservadas cuando:
+[116] Normal: Presenten relación con la variable objetivo. 
+[117] Normal: No tengan demasiados datos faltantes. 
+[118] Normal: No sean redundantes. 
+[119] Normal: Puedan calcularse en nuevas URLs. 
+[120] Normal: Tengan interpretación dentro del problema de phishing. 
+[121] Normal: Algoritmos, técnicas y métodos
+[122] Normal: Análisis exploratorio de datos. 
+[123] Normal: Estadística descriptiva. 
+[124] Normal: Correlación. 
+[125] Normal: ANOVA. 
+[126] Normal: Chi-cuadrado. 
+[127] Normal: Información mutua. 
+[128] Normal: Random Forest para importancia de variables. 
+[129] Normal: Ingeniería de características. 
+[130] Normal: Software
+[131] Normal: Python. 
+[132] Normal: Google Colab. 
+[133] Normal: Pandas. 
+[134] Normal: NumPy. 
+[135] Normal: Matplotlib. 
+[136] Normal: Scikit-learn. 
+[137] Normal: Microsoft Excel, como apoyo. 
+[138] Normal: Producto de la fase
+[139] Normal: Dataset analizado. 
+[140] Normal: Diccionario de datos. 
+[141] Normal: Informe de calidad de los datos. 
+[142] Normal: Variables categóricas y numéricas identificadas. 
+[143] Normal: Lista de características seleccionadas. 
+[146] Normal: FASE 2. DISEÑO Y CONFIGURACIÓN DEL MODELO TABTRANSFORMER
+[148] Normal: Objetivo específico relacionado
+[149] Normal: Elaborar la configuración del modelo TabTransformer, definiendo el tratamiento de las variables categóricas y numéricas, la cantidad de capas de atención y los demás parámetros necesarios para su aplicación a la clasificación de URLs maliciosas.
+[151] Normal: Propósito de la fase
+[152] Normal: Diseñar la arquitectura del modelo que procesará simultáneamente las variables categóricas y numéricas del conjunto de datos.
+[153] Normal: El archivo explica que TabTransformer convierte las variables categóricas en embeddings, las procesa mediante bloques Transformer y luego las combina con variables numéricas para realizar la clasificación final. 
+[155] Normal: Actividades y pasos detallados
+[156] Normal: Paso 1. Separar las variables según su naturaleza
+[157] Normal: Se formarán tres grupos:
+[158] Normal: Variables categóricas. 
+[159] Normal: Variables numéricas. 
+[160] Normal: Variable objetivo. 
+[161] Normal: Ejemplo:
+[162] Normal: Categóricas:
+[163] Normal: Protocolo. 
+[164] Normal: Dominio de nivel superior. 
+[165] Normal: Tipo de dominio. 
+[166] Normal: Uso de IP. 
+[167] Normal: Numéricas:
+[168] Normal: Longitud de URL. 
+[169] Normal: Número de puntos. 
+[170] Normal: Número de guiones. 
+[171] Normal: Número de subdominios. 
+[172] Normal: Número de dígitos. 
+[174] Normal: Paso 2. Definir la arquitectura general
+[175] Normal: La arquitectura tendrá los siguientes componentes:
+[176] Normal: Entrada de variables categóricas. 
+[177] Normal: Embeddings de columna. 
+[178] Normal: Bloques Transformer. 
+[179] Normal: Autoatención de múltiples cabezas. 
+[180] Normal: Conexiones residuales. 
+[181] Normal: Normalización de capa. 
+[182] Normal: Red feed-forward. 
+[183] Normal: Entrada de variables numéricas. 
+[184] Normal: Concatenación. 
+[185] Normal: Perceptrón multicapa. 
+[186] Normal: Capa de salida. 
+[188] Normal: Paso 3. Codificar las variables categóricas
+[189] Normal: Cada categoría será convertida en un índice entero.
+[190] Normal: Ejemplo:
+[191] Normal: Después, cada código será transformado en un vector mediante una capa de embedding.
+[193] Normal: Paso 4. Determinar la dimensión de los embeddings
+[194] Normal: Se probarán dimensiones como:
+[199] Normal: Una dimensión inicial recomendable es 16 o 32.
+[201] Normal: Paso 5. Definir los bloques Transformer
+[202] Normal: Cada bloque tendrá:
+[203] Normal: Multi-Head Self-Attention. 
+[204] Normal: Conexión residual. 
+[205] Normal: Layer Normalization. 
+[206] Normal: Red feed-forward. 
+[207] Normal: Segunda conexión residual. 
+[208] Normal: Segunda normalización. 
+[210] Normal: Paso 6. Definir la atención de múltiples cabezas
+[211] Normal: Se probarán:
+[212] Normal: 2 cabezas. 
+[213] Normal: 4 cabezas. 
+[214] Normal: 8 cabezas. 
+[215] Normal: Como configuración inicial se emplearán 4 cabezas.
+[217] Normal: Paso 7. Definir el número de bloques Transformer
+[218] Normal: Se probarán:
+[219] Normal: 1 bloque. 
+[220] Normal: 2 bloques. 
+[221] Normal: 3 bloques. 
+[222] Normal: 4 bloques. 
+[223] Normal: Se recomienda iniciar con 2 bloques.
+[225] Normal: Paso 8. Integrar las variables numéricas
+[226] Normal: Las variables numéricas normalizadas serán concatenadas con los embeddings contextuales generados por el Transformer.
+[228] Normal: Paso 9. Diseñar el perceptrón multicapa
+[229] Normal: Configuración sugerida:
+[230] Normal: Primera capa densa: 128 neuronas. 
+[231] Normal: Segunda capa densa: 64 neuronas. 
+[232] Normal: Activación: ReLU o GELU. 
+[233] Normal: Dropout: 0.20 o 0.30. 
+[234] Normal: Capa de salida: una neurona con sigmoid. 
+[236] Normal: Paso 10. Definir la salida del modelo
+[237] Normal: Para clasificación binaria:
+[238] Normal: Clase 0: URL legítima. 
+[239] Normal: Clase 1: URL de phishing. 
+[240] Normal: Activación: sigmoid. 
+[241] Normal: Función de pérdida: Binary Cross-Entropy. 
+[243] Normal: Paso 11. Establecer los hiperparámetros iniciales
+[245] Normal: Algoritmos y técnicas
+[246] Normal: TabTransformer. 
+[247] Normal: Embeddings de columnas. 
+[248] Normal: Autoatención. 
+[249] Normal: Multi-Head Attention. 
+[250] Normal: Layer Normalization. 
+[251] Normal: Conexiones residuales. 
+[252] Normal: Red feed-forward. 
+[253] Normal: Perceptrón multicapa. 
+[254] Normal: Dropout. 
+[256] Normal: Software
+[257] Normal: Python. 
+[258] Normal: TensorFlow/Keras o PyTorch. 
+[259] Normal: Google Colab. 
+[260] Normal: NumPy. 
+[261] Normal: Scikit-learn. 
+[263] Normal: Producto de la fase
+[264] Normal: Arquitectura del modelo. 
+[265] Normal: Diagrama del TabTransformer. 
+[266] Normal: Hiperparámetros iniciales. 
+[267] Normal: Código de construcción del modelo. 
+[270] Normal: FASE 3. PREPROCESAMIENTO Y ENTRENAMIENTO DEL MODELO
+[272] Normal: Objetivo específico relacionado
+[273] Normal: Desarrollar el proceso de entrenamiento del modelo TabTransformer utilizando el conjunto de datos preprocesado, aplicando técnicas de codificación, normalización y balanceo de clases.
+[275] Normal: Propósito de la fase
+[276] Normal: Preparar los datos y entrenar el modelo para que aprenda a diferenciar URLs legítimas de URLs relacionadas con ataques de phishing.
+[278] Normal: Actividades y pasos detallados
+[280] Normal: Paso 1. Separar variables predictoras y objetivo
+[284] Normal: Paso 2. Dividir el conjunto de datos
+[285] Normal: Se utilizará una división estratificada:
+[286] Normal: 70 % entrenamiento. 
+[287] Normal: 15 % validación. 
+[288] Normal: 15 % prueba. 
+[289] Normal: La estratificación permitirá conservar proporciones similares de cada clase.
+[291] Normal: Paso 3. Codificar variables categóricas
+[292] Normal: Se ajustará el codificador solamente con el conjunto de entrenamiento.
+[293] Normal: Posteriormente se aplicará el mismo codificador a:
+[294] Normal: Validación. 
+[295] Normal: Prueba. 
+[297] Normal: Paso 4. Normalizar variables numéricas
+[298] Normal: Se utilizará inicialmente StandardScaler.
+[301] Normal: El escalador se ajustará únicamente con entrenamiento para evitar fuga de información.
+[303] Normal: Paso 5. Analizar el desbalance
+[304] Normal: Se calculará la proporción de:
+[305] Normal: URLs legítimas. 
+[306] Normal: URLs de phishing. 
+[308] Normal: Paso 6. Aplicar tratamiento del desbalance
+[309] Normal: La primera opción será el uso de pesos de clase.
+[310] Normal: También se podrán evaluar:
+[311] Normal: Sobremuestreo aleatorio. 
+[312] Normal: Submuestreo. 
+[313] Normal: SMOTE para las variables numéricas. 
+[314] Normal: El balanceo se aplicará únicamente en el conjunto de entrenamiento.
+[316] Normal: Paso 7. Compilar el modelo
+[317] Normal: Se configurará:
+[318] Normal: Optimizador Adam. 
+[319] Normal: Binary Cross-Entropy. 
+[320] Normal: Accuracy. 
+[321] Normal: Precision. 
+[322] Normal: Recall. 
+[323] Normal: AUC. 
+[325] Normal: Paso 8. Configurar funciones de control
+[326] Normal: Se utilizarán:
+[327] Normal: EarlyStopping. 
+[328] Normal: ModelCheckpoint. 
+[329] Normal: ReduceLROnPlateau. 
+[330] Normal: TensorBoard. 
+[332] Normal: Paso 9. Entrenar el modelo
+[333] Normal: El entrenamiento se realizará por lotes.
+[334] Normal: En cada época:
+[335] Normal: El modelo recibe un lote de datos. 
+[336] Normal: Realiza una predicción. 
+[337] Normal: Calcula la pérdida. 
+[338] Normal: Ejecuta retropropagación. 
+[339] Normal: Adam actualiza los pesos. 
+[340] Normal: Se evalúa el conjunto de validación. 
+[342] Normal: Paso 10. Supervisar las curvas
+[343] Normal: Se observarán:
+[344] Normal: Pérdida de entrenamiento. 
+[345] Normal: Pérdida de validación. 
+[346] Normal: Accuracy. 
+[347] Normal: Precision. 
+[348] Normal: Recall. 
+[349] Normal: AUC. 
+[351] Normal: Paso 11. Detectar sobreajuste
+[352] Normal: Existirá sobreajuste cuando:
+[353] Normal: La pérdida de entrenamiento continúe disminuyendo. 
+[354] Normal: La pérdida de validación empiece a aumentar. 
+[355] Normal: El desempeño de entrenamiento sea muy superior al de validación. 
+[357] Normal: Paso 12. Ajustar hiperparámetros
+[358] Normal: Se probarán diferentes combinaciones de:
+[359] Normal: Embeddings. 
+[360] Normal: Cabezas de atención. 
+[361] Normal: Bloques Transformer. 
+[362] Normal: Dropout. 
+[363] Normal: Tasa de aprendizaje. 
+[364] Normal: Número de neuronas. 
+[365] Normal: Tamaño del lote. 
+[367] Normal: Paso 13. Aplicar optimización
+[368] Normal: Se podrá utilizar:
+[369] Normal: Random Search. 
+[370] Normal: Keras Tuner. 
+[371] Normal: Optuna. 
+[372] Normal: Optimización bayesiana. 
+[374] Normal: Paso 14. Seleccionar el mejor modelo
+[375] Normal: Se elegirá considerando principalmente:
+[376] Normal: F1-score de validación. 
+[377] Normal: Recall de phishing. 
+[378] Normal: AUC. 
+[379] Normal: Pérdida de validación. 
+[381] Normal: Paso 15. Guardar el modelo
+[382] Normal: Se conservarán:
+[383] Normal: Arquitectura. 
+[384] Normal: Pesos. 
+[385] Normal: Codificadores. 
+[386] Normal: Escalador. 
+[387] Normal: Variables utilizadas. 
+[388] Normal: Configuración final. 
+[389] Normal: Algoritmos y técnicas
+[390] Normal: Aprendizaje supervisado. 
+[391] Normal: Adam. 
+[392] Normal: Descenso de gradiente. 
+[393] Normal: Retropropagación. 
+[394] Normal: Binary Cross-Entropy. 
+[395] Normal: Pesos de clase. 
+[396] Normal: Early Stopping. 
+[397] Normal: Dropout. 
+[398] Normal: Regularización. 
+[399] Normal: Optimización de hiperparámetros. 
+[400] Normal: Software
+[401] Normal: TensorFlow/Keras o PyTorch. 
+[402] Normal: Scikit-learn. 
+[403] Normal: Imbalanced-learn. 
+[404] Normal: Keras Tuner u Optuna. 
+[405] Normal: Google Colab con GPU. 
+[406] Normal: Producto de la fase
+[407] Normal: Dataset preprocesado. 
+[408] Normal: Modelo entrenado. 
+[409] Normal: Hiperparámetros optimizados. 
+[410] Normal: Curvas de entrenamiento. 
+[411] Normal: Modelo guardado. 
+[415] Normal: FASE 4. EVALUACIÓN DEL DESEMPEÑO DEL MODELO
+[417] Normal: Objetivo específico relacionado
+[418] Normal: Medir el desempeño del modelo TabTransformer entrenado a partir de las métricas de exactitud, precisión, sensibilidad, puntaje F1 y área bajo la curva ROC, con el fin de determinar su capacidad para detectar URLs asociadas a ataques de phishing.
+[420] Normal: Propósito de la fase
+[421] Normal: Determinar objetivamente si el modelo identifica correctamente las URLs de phishing y si mantiene un nivel aceptable de errores.
+[422] Normal: El documento adjunto considera la matriz de confusión, exactitud, precisión, recall, F1 y AUC como métricas principales de evaluación. 
+[424] Normal: Actividades y pasos detallados
+[426] Normal: Paso 1. Cargar el mejor modelo
+[427] Normal: Se utilizará la configuración que obtuvo mejores resultados en validación.
+[429] Normal: Paso 2. Realizar predicciones
+[430] Normal: El modelo generará una probabilidad para cada URL.
+[431] Normal: Ejemplo:
+[433] Normal: Paso 3. Aplicar el umbral de clasificación
+[434] Normal: Inicialmente se empleará:
+[436] Normal: Menor que 0.50: legítima. 
+[437] Normal: Igual o mayor que 0.50: phishing. 
+[439] Normal: Paso 4. Construir la matriz de confusión
+[440] Normal: Se calcularán:
+[441] Normal: Verdaderos positivos. 
+[442] Normal: Verdaderos negativos. 
+[443] Normal: Falsos positivos. 
+[444] Normal: Falsos negativos. 
+[446] Normal: Paso 5. Calcular la exactitud
+[449] Normal: Paso 6. Calcular la precisión
+[452] Normal: Paso 7. Calcular la sensibilidad
+[454] Normal: Esta métrica es especialmente importante porque mide cuántas URLs maliciosas fueron detectadas.
+[456] Normal: Paso 8. Calcular el F1-score
+[459] Normal: Paso 9. Calcular la especificidad
+[462] Normal: Paso 10. Calcular ROC-AUC
+[463] Normal: Se construirá:
+[464] Normal: Curva ROC. 
+[465] Normal: Área bajo la curva. 
+[467] Normal: Paso 11. Construir la curva Precision-Recall
+[468] Normal: Será especialmente útil cuando exista desbalance de clases.
+[470] Normal: Paso 12. Analizar errores
+[471] Normal: Se revisarán:
+[472] Normal: URLs legítimas clasificadas como phishing. 
+[473] Normal: URLs de phishing clasificadas como legítimas. 
+[474] Normal: Patrones comunes en los errores. 
+[475] Normal: Características que causaron confusión. 
+[476] Normal: Paso 13. Ajustar el umbral
+[477] Normal: Podrán probarse valores como:
+[478] Normal: 0.40. 
+[479] Normal: 0.45. 
+[480] Normal: 0.50. 
+[481] Normal: 0.55. 
+[482] Normal: 0.60. 
+[483] Normal: El objetivo será reducir falsos negativos sin aumentar excesivamente los falsos positivos.
+[485] Normal: Paso 14. Aplicar validación cruzada
+[486] Normal: Se recomienda una validación cruzada estratificada de cinco pliegues.
+[487] Normal: Se informará:
+[488] Normal: Promedio de las métricas. 
+[489] Normal: Desviación estándar. 
+[490] Normal: Variación entre particiones. 
+[492] Normal: Paso 15. Medir eficiencia
+[493] Normal: Se calcularán:
+[494] Normal: Tiempo de entrenamiento. 
+[495] Normal: Tiempo de predicción. 
+[496] Normal: Número de parámetros. 
+[497] Normal: Consumo aproximado de memoria. 
+[498] Normal: Técnicas y métricas
+[499] Normal: Matriz de confusión. 
+[500] Normal: Accuracy. 
+[501] Normal: Precision. 
+[502] Normal: Recall. 
+[503] Normal: Especificidad. 
+[504] Normal: F1-score. 
+[505] Normal: ROC-AUC. 
+[506] Normal: Curva Precision-Recall. 
+[507] Normal: Validación cruzada estratificada. 
+[508] Normal: Análisis de falsos positivos y negativos. 
+[509] Normal: Software
+[510] Normal: Scikit-learn. 
+[511] Normal: Matplotlib. 
+[512] Normal: TensorFlow/Keras. 
+[513] Normal: Pandas. 
+[514] Normal: NumPy. 
+[515] Normal: Producto de la fase
+[516] Normal: Informe de clasificación. 
+[517] Normal: Matriz de confusión. 
+[518] Normal: Curva ROC. 
+[519] Normal: Curva Precision-Recall. 
+[520] Normal: Tabla de métricas. 
+[521] Normal: Análisis de errores. 
+[523] Normal: FASE 5. COMPARACIÓN, INTERPRETACIÓN Y DETERMINACIÓN DE LA EFICACIA
+[525] Normal: Objetivo específico relacionado
+[526] Normal: Contrastar los resultados alcanzados por el modelo TabTransformer con los valores reportados en los antecedentes de investigación revisados, con el propósito de situar el aporte del presente trabajo dentro del estado actual del conocimiento sobre detección de URLs maliciosas.
+[528] Normal: Relación con el objetivo general
+[529] Normal: Esta fase permite cumplir directamente el objetivo general, porque con los resultados obtenidos se determinará la eficacia real del modelo TabTransformer.
+[531] Normal: Propósito de la fase
+[532] Normal: Comparar el modelo con otros algoritmos, interpretar sus resultados y establecer sus ventajas, limitaciones y aporte.
+[534] Normal: Actividades y pasos detallados
+[536] Normal: Paso 1. Seleccionar modelos de comparación
+[537] Normal: Se recomienda implementar:
+[538] Normal: Regresión logística. 
+[539] Normal: Naive Bayes. 
+[540] Normal: Random Forest. 
+[541] Normal: XGBoost o LightGBM. 
+[542] Normal: Perceptrón multicapa. 
+[543] Normal: Opcionalmente:
+[544] Normal: CNN. 
+[545] Normal: LSTM. 
+[547] Normal: Paso 2. Mantener condiciones iguales
+[548] Normal: Todos los modelos deberán utilizar:
+[549] Normal: Mismos datos. 
+[550] Normal: Mismas variables. 
+[551] Normal: Misma división. 
+[552] Normal: Mismo conjunto de prueba. 
+[553] Normal: Mismas métricas. 
+[555] Normal: Paso 3. Entrenar los modelos de referencia
+[556] Normal: Cada algoritmo será entrenado con el conjunto de entrenamiento.
+[558] Normal: Paso 4. Evaluar los modelos
+[559] Normal: Se calcularán:
+[560] Normal: Accuracy. 
+[561] Normal: Precision. 
+[562] Normal: Recall. 
+[563] Normal: F1. 
+[564] Normal: AUC. 
+[565] Normal: Tiempo de entrenamiento. 
+[566] Normal: Tiempo de predicción. 
+[568] Normal: Paso 5. Construir una tabla comparativa
+[570] Normal: Paso 6. Comparar con los antecedentes
+[571] Normal: Se contrastarán los resultados propios con los estudios revisados en el archivo:
+[572] Normal: TabTransformer personalizado para anomalías. 
+[573] Normal: Naive Bayes y Random Forest. 
+[574] Normal: PMANet. 
+[575] Normal: SemanticPhishNet. 
+[576] Normal: ELECTRA. 
+[577] Normal: CNN y LSTM. 
+[579] Normal: Paso 7. Considerar las condiciones de cada estudio
+[580] Normal: La comparación tendrá en cuenta:
+[581] Normal: Tamaño del dataset. 
+[582] Normal: Número de clases. 
+[583] Normal: Balance de clases. 
+[584] Normal: Características utilizadas. 
+[585] Normal: Técnica de validación. 
+[586] Normal: Dataset interno o externo. 
+[587] Normal: Recursos computacionales. 
+[589] Normal: Paso 8. Determinar la eficacia
+[590] Normal: La eficacia del modelo se analizará considerando cuatro dimensiones:
+[591] Normal: Eficacia predictiva
+[592] Normal: Capacidad para clasificar correctamente las URLs.
+[593] Normal: Eficacia de seguridad
+[594] Normal: Capacidad para reducir falsos negativos.
+[595] Normal: Eficiencia computacional
+[596] Normal: Tiempo y recursos necesarios.
+[597] Normal: Capacidad de generalización
+[598] Normal: Desempeño sobre datos no utilizados en el entrenamiento.
+[600] Normal: Paso 9. Formular conclusiones
+[601] Normal: Las conclusiones responderán directamente:
+[602] Normal: Qué variables fueron más relevantes. 
+[603] Normal: Cómo fue configurado el modelo. 
+[604] Normal: Qué desempeño alcanzó. 
+[605] Normal: Si superó o no a los modelos clásicos. 
+[606] Normal: Qué limitaciones presentó. 
+[607] Normal: En qué condiciones podría utilizarse. 
+[609] Normal: Paso 10. Formular recomendaciones
+[610] Normal: Se podrán proponer:
+[611] Normal: Uso de datasets externos. 
+[612] Normal: Actualización periódica del modelo. 
+[613] Normal: Inclusión de variables de host. 
+[614] Normal: Integración de información a nivel de caracteres. 
+[615] Normal: Implementación como API. 
+[616] Normal: Uso en extensiones de navegador. 
+[617] Normal: Evaluación frente a nuevas campañas de phishing. 
+[618] Normal: Algoritmos y técnicas
+[619] Normal: Regresión logística. 
+[620] Normal: Naive Bayes. 
+[621] Normal: Random Forest. 
+[622] Normal: XGBoost o LightGBM. 
+[623] Normal: TabTransformer. 
+[624] Normal: Análisis comparativo. 
+[625] Normal: Análisis de resultados. 
+[626] Normal: Evaluación experimental. 
+[627] Normal: Software
+[628] Normal: Scikit-learn. 
+[629] Normal: XGBoost o LightGBM. 
+[630] Normal: TensorFlow/Keras. 
+[631] Normal: Pandas. 
+[632] Normal: Matplotlib. 
+[633] Normal: Microsoft Excel. 
+[634] Normal: Producto de la fase
+[635] Normal: Tabla comparativa de modelos. 
+[636] Normal: Discusión de resultados. 
+[637] Normal: Determinación de la eficacia. 
+[638] Normal: Conclusiones. 
+[639] Normal: Recomendaciones. 
+[640] Normal: Identificación del aporte del trabajo. 
