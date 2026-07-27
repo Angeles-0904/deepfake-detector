@@ -35,9 +35,9 @@ from src.utils import (
 
 st.set_page_config(
     page_title="DeepFake Detector",
-    page_icon="◇",
+    page_icon="\U0001F98B",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 
@@ -91,11 +91,38 @@ CUSTOM_CSS = """
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
 
-    /* ── Tipografia ── */
     h1, h2, h3, h4, .serif { font-family: var(--font-serif); color: var(--text); }
     .mono { font-family: 'Courier New', monospace; }
 
-    /* ── Header ── */
+    .nav-item {
+        padding: 0.6rem 1rem;
+        margin: 0.15rem 0;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        color: var(--text-soft);
+        transition: all 0.15s ease;
+        border: 1px solid transparent;
+    }
+    .nav-item:hover {
+        background: var(--rose-glow);
+        border-color: var(--rose-border);
+        color: var(--text);
+    }
+    .nav-item.active {
+        background: var(--rose-glow);
+        border-color: var(--rose-border);
+        color: var(--rose);
+        font-weight: 500;
+    }
+    .nav-icon {
+        display: inline-block;
+        width: 1.4rem;
+        text-align: center;
+        margin-right: 0.5rem;
+        font-family: var(--font-sans);
+    }
+
     .header {
         display: flex; align-items: center; justify-content: space-between;
         padding: 1.25rem 0 0.75rem;
@@ -108,7 +135,10 @@ CUSTOM_CSS = """
         border: 1.5px solid var(--rose-border);
         border-radius: 10px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 1.1rem;
+        font-family: var(--font-serif);
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--rose);
     }
     .header-title {
         font-family: var(--font-serif);
@@ -144,7 +174,6 @@ CUSTOM_CSS = """
         font-weight: 300;
     }
 
-    /* ── Hero ── */
     .hero {
         text-align: center;
         padding: 2rem 1rem 1.75rem;
@@ -197,7 +226,6 @@ CUSTOM_CSS = """
     }
     .hero-sub strong { color: var(--gold); font-weight: 500; }
 
-    /* ── Cards ── */
     .card {
         background: var(--card);
         border: 1px solid var(--border);
@@ -219,7 +247,6 @@ CUSTOM_CSS = """
         font-family: var(--font-sans);
     }
 
-    /* ── Result Cards ── */
     .result-box {
         padding: 1.5rem;
         border-radius: 10px;
@@ -233,10 +260,7 @@ CUSTOM_CSS = """
         background: var(--danger-bg);
         border: 1px solid var(--danger-border);
     }
-    .result-symbol {
-        font-size: 2rem;
-        margin-bottom: 0.4rem;
-    }
+    .result-symbol { font-size: 2rem; margin-bottom: 0.4rem; }
     .result-name {
         font-family: var(--font-serif);
         font-size: 1.8rem;
@@ -256,7 +280,6 @@ CUSTOM_CSS = """
         font-weight: 300;
     }
 
-    /* ── Gauge ── */
     .gauge-box { text-align: center; padding: 0.25rem; }
     .gauge-ring {
         position: relative;
@@ -290,7 +313,6 @@ CUSTOM_CSS = """
         font-weight: 300;
     }
 
-    /* ── Score ── */
     .score-box { text-align: center; padding: 0.25rem; }
     .score-icon { font-size: 1.7rem; margin-bottom: 0.4rem; }
     .score-num {
@@ -335,7 +357,6 @@ CUSTOM_CSS = """
         transition: width 1s ease;
     }
 
-    /* ── Section Title ── */
     .sec-title {
         display: flex;
         align-items: center;
@@ -354,7 +375,6 @@ CUSTOM_CSS = """
         border-radius: 2px;
     }
 
-    /* ── Explanation ── */
     .explain-box {
         padding: 1rem 1.1rem;
         border: 1px solid var(--border);
@@ -366,7 +386,6 @@ CUSTOM_CSS = """
     }
     .explain-box strong { color: var(--gold); font-weight: 500; }
 
-    /* ── Heat legend ── */
     .heat-legend {
         display: flex; align-items: center;
         gap: 10px; justify-content: center;
@@ -383,7 +402,6 @@ CUSTOM_CSS = """
         background: linear-gradient(to right, #2A1A4A, #4A1A5A, #5A3A3A, #6A4A2A, #7A2A2A);
     }
 
-    /* ── Uploader ── */
     .stFileUploader {
         border: 1.5px dashed rgba(212,135,143,0.2);
         border-radius: 10px;
@@ -411,7 +429,6 @@ CUSTOM_CSS = """
         color: var(--text-muted) !important;
     }
 
-    /* ── Buttons ── */
     div.stButton > button:first-child {
         background: linear-gradient(135deg, var(--rose), var(--gold));
         color: #0A0808;
@@ -449,7 +466,6 @@ CUSTOM_CSS = """
         color: var(--rose);
     }
 
-    /* ── Alerts ── */
     .stAlert, .stError, .stWarning, .stSuccess, .stInfo {
         border-radius: 8px !important;
         border-width: 1px !important;
@@ -630,9 +646,9 @@ def render_gauge(pct: float, color: str) -> str:
     return f"""
     <div class="gauge-ring">
         <svg width="110" height="110" viewBox="0 0 110 110">
-            <circle class="gauge-track" cx="55" cy="55" r="{r}"/>
-            <circle class="gauge-fill" cx="55" cy="55" r="{r}"
-                    stroke="{color}" stroke-dasharray="{c}" stroke-dashoffset="{off}"/>
+            <circle class="gauge-track" cx="55" cy="55" r=\"{r}\"/>
+            <circle class="gauge-fill" cx="55" cy="55" r=\"{r}\"
+                    stroke=\"{color}\" stroke-dasharray=\"{c}\" stroke-dashoffset=\"{off}\"/>
         </svg>
         <div class="gauge-val" style="color:{color}">{pct:.1f}%</div>
     </div>
@@ -645,45 +661,59 @@ if "current_result" not in st.session_state:
     st.session_state.current_result = None
 if "robustness_results" not in st.session_state:
     st.session_state.robustness_results = None
+if "nav_page" not in st.session_state:
+    st.session_state.nav_page = "Analisis"
 
 
 def main():
     with st.sidebar:
         st.markdown(
-            '<div style="text-align:center;padding:1.25rem 0.5rem 0.25rem;">'
-            '
-<div style="width:42px;height:42px;margin:0 auto 0.75rem;'
+            '<div style="text-align:center;padding:1rem 0.5rem;">'
+            '<div style="width:42px;height:42px;margin:0 auto 0.75rem;'
             'border:1.5px solid var(--rose-border);border-radius:10px;'
             'display:flex;align-items:center;justify-content:center;'
             'font-family:var(--font-serif);font-size:0.85rem;font-weight:600;'
             'color:var(--rose);">DF</div>'
             '<p style="font-family:var(--font-serif);font-weight:600;color:var(--text);'
             'margin:0;font-size:1rem;">DeepFake Detector</p>'
-            '<p style="font-size:0.6rem;color:var(--text-muted);text-transform:uppercase;'
-            'letter-spacing:1.5px;margin-top:0.2rem;">Analisis Forense</p>'
             '</div>',
             unsafe_allow_html=True,
         )
+
+        st.markdown("---")
+
+        # ── Navegacion ──
+        pages = ["Analisis", "Historial", "Explicacion del Modelo"]
+        icons = ["\u25B3", "\u25C6", "\u25A1"]
+
+        for page, icon in zip(pages, icons):
+            active = st.session_state.nav_page == page
+            cls = "nav-item active" if active else "nav-item"
+            st.markdown(
+                f'<div class="{cls}" onclick="alert(\'Streamlit navigation\')">'
+                f'<span class="nav-icon">{icon}</span>{page}</div>',
+                unsafe_allow_html=True,
+            )
+
         st.markdown("---")
         st.markdown(
-            '<p style="font-size:0.75rem;font-weight:500;color:var(--text);'
-            'margin:0 0 0.5rem;">Procedimiento</p>'
-            '<ol style="color:var(--text-soft);font-size:0.75rem;line-height:1.9;'
-            'padding-left:1rem;margin:0;font-weight:300;">'
-            '<li>Cargar una imagen facial</li>'
-            '<li>Ejecutar el analisis</li>'
-            '<li>Revisar prediccion y mapa de activacion</li>'
-            '</ol>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
             '<p style="font-size:0.7rem;color:var(--text-muted);margin-top:0.75rem;'
-            'line-height:1.6;font-weight:300;">'
+            'line-height:1.6;font-weight:300;text-align:center;">'
             'Modelo: <strong style="color:var(--rose);font-weight:500;">DenseNet-121</strong><br>'
             'Explicabilidad: <strong style="color:var(--rose);font-weight:500;">Grad-CAM</strong></p>',
             unsafe_allow_html=True,
         )
+
+        nav_option = st.radio(
+            "",
+            pages,
+            index=pages.index(st.session_state.nav_page),
+            label_visibility="collapsed",
+            key="nav_radio",
+        )
+
         st.markdown("---")
+
         st.markdown(
             f'<div class="stat-grid">'
             f'<div class="stat-item"><div class="v">{DEVICE.upper()}</div>'
@@ -694,307 +724,412 @@ def main():
             unsafe_allow_html=True,
         )
 
-    loading = st.empty()
-    loading.markdown(
-        '<div class="loading-box">'
-        '<div class="loading-spin"></div>'
-        '<div class="loading-txt">Inicializando modelo...</div>'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-    try:
-        model, gradcam = load_model()
-        model_ready = True
-        loading.empty()
-    except Exception as e:
-        loading.empty()
-        st.error(f"Error al cargar el modelo: {e}")
-        model_ready = False
-        gradcam = None
+    if nav_option != st.session_state.nav_page:
+        st.session_state.nav_page = nav_option
+        st.rerun()
 
-    st.markdown(
-        '<div class="header">'
-        '<div class="header-left">'
-        '<div class="header-logo" style="font-family:var(--font-serif);font-weight:600;color:var(--rose);font-size:0.85rem;">DF</div>'
-        '<div>'
-        '<p class="header-title">DeepFake Detector</p>'
-        '<p class="header-sub">Computer Vision &bull; Deep Learning</p>'
-        '</div>'
-        '</div>'
-        '<div class="header-status">'
-        '<div class="status-dot"></div>'
-        '<span class="status-text">Sistema activo</span>'
-        '</div>'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        '<div class="hero">'
-        '<div class="hero-glow"></div>'
-        '<div class="hero-badge">Inteligencia Artificial en accion</div>'
-        '<h1 class="hero-title">Deteccion de<br><span>DeepFakes</span></h1>'
-        '<p class="hero-sub">'
-        'Determina si una imagen facial es <strong>autentica</strong> o ha sido '
-        '<strong>generada por IA</strong> mediante analisis profundo '
-        'con mapas de activacion.</p>'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-
-    uploaded_file = st.file_uploader(
-        "Arrastra una imagen facial aqui",
-        type=["jpg", "jpeg", "png"],
-        help="Formatos: JPG, JPEG, PNG",
-    )
-
-    col_btn, col_preview = st.columns([3, 2])
-    with col_btn:
-        analyze = st.button(
-            "Ejecutar Analisis",
-            type="primary",
-            disabled=not (model_ready and uploaded_file is not None),
-            use_container_width=True,
+    # ═══════════════════════════════════════════════
+    # PAGINA: ANALISIS
+    # ═══════════════════════════════════════════════
+    if st.session_state.nav_page == "Analisis":
+        loading = st.empty()
+        loading.markdown(
+            '<div class="loading-box">'
+            '<div class="loading-spin"></div>'
+            '<div class="loading-txt">Inicializando modelo...</div>'
+            '</div>',
+            unsafe_allow_html=True,
         )
-
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file).convert("RGB")
-        with col_preview:
-            st.markdown('<p class="preview-lbl">Previsualizacion</p>', unsafe_allow_html=True)
-            st.image(image, width=200)
-
-        if analyze:
-            analyzing = st.empty()
-            analyzing.markdown(
-                '<div class="loading-box">'
-                '<div class="loading-spin"></div>'
-                '<div class="loading-txt">Analizando imagen...</div>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-            try:
-                class_idx, confidence, logits = predict_image(model, image)
-                class_name = CLASS_NAMES[class_idx]
-                heatmap_raw, heatmap_resized = gradcam.generate(image, class_idx)
-                overlay = gradcam.overlay_heatmap(image, heatmap_resized)
-                explanation = gradcam.generate_explanation(class_idx, confidence, heatmap_resized)
-                overlay_b64 = image_to_base64(overlay)
-                image_b64 = image_to_base64(image)
-
-                st.session_state.current_result = {
-                    "class_idx": class_idx, "class_name": class_name,
-                    "confidence": confidence, "image": image,
-                    "image_b64": image_b64, "overlay": overlay,
-                    "overlay_b64": overlay_b64, "heatmap_raw": heatmap_raw,
-                    "heatmap_resized": heatmap_resized, "explanation": explanation,
-                    "logits": logits,
-                }
-                st.session_state.history.append({
-                    "class_name": class_name, "confidence": confidence,
-                    "image_b64": image_b64, "overlay_b64": overlay_b64,
-                })
-                if len(st.session_state.history) > MAX_HISTORY:
-                    st.session_state.history = st.session_state.history[-MAX_HISTORY:]
-                analyzing.empty()
-            except Exception as e:
-                analyzing.empty()
-                st.error(f"Error durante el analisis: {e}")
-                logger.error(f"Error en analisis: {e}", exc_info=True)
-
-    if st.session_state.current_result is not None:
-        res = st.session_state.current_result
-        is_fake = res["class_idx"] == 0
-        cls = "fake" if is_fake else "real"
-        color = "#D4878F" if is_fake else "#A8C8A0"
+        try:
+            model, gradcam = load_model()
+            model_ready = True
+            loading.empty()
+        except Exception as e:
+            loading.empty()
+            st.error(f"Error al cargar el modelo: {e}")
+            model_ready = False
+            gradcam = None
 
         st.markdown(
-            '<div class="sec-title">'
-            '<div class="sec-accent"></div>'
-            'Resultados del Analisis'
+            '<div class="header">'
+            '<div class="header-left">'
+            '<div class="header-logo">DF</div>'
+            '<div>'
+            '<p class="header-title">DeepFake Detector</p>'
+            '<p class="header-sub">Computer Vision &bull; Deep Learning</p>'
+            '</div>'
+            '</div>'
+            '<div class="header-status">'
+            '<div class="status-dot"></div>'
+            '<span class="status-text">Sistema activo</span>'
+            '</div>'
             '</div>',
             unsafe_allow_html=True,
         )
 
-        c1, c2, c3 = st.columns(3)
-
-        with c1:
-            st.markdown(
-                f'<div class="result-box {cls}">'
-                f'<div class="result-symbol">{chr(10008) if is_fake else chr(10004)}</div>'
-                f'<p class="result-name {cls}">{res["class_name"]}</p>'
-                f'<p class="result-foot">Prediccion</p>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-
-        with c2:
-            conf = res["confidence"] * 100
-            gc = "#D4878F" if conf < 70 else "#E0C88A" if conf < 90 else "#A8C8A0"
-            st.markdown(
-                f'<div class="card gauge-box">'
-                + render_gauge(conf, gc) +
-                '<p class="gauge-foot">Confianza</p>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-
-        with c3:
-            score = torch.softmax(res["logits"], dim=1)[0][1].item()
-            st.markdown(
-                f'<div class="card score-box">'
-                f'<div class="score-icon">{chr(9762)}</div>'
-                f'<div class="score-num">{score:.4f}</div>'
-                f'<div class="score-foot">Score Real</div>'
-                f'<div class="score-track">'
-                f'<div class="score-labels"><span>0</span><span>1</span></div>'
-                f'<div class="score-bar">'
-                f'<div class="score-fill" style="width:{score*100}%"></div>'
-                f'</div></div></div>',
-                unsafe_allow_html=True,
-            )
-
         st.markdown(
-            '<div class="sec-title">'
-            '<div class="sec-accent"></div>'
-            'Activacion del Modelo'
+            '<div class="hero">'
+            '<div class="hero-glow"></div>'
+            '<div class="hero-badge">Inteligencia Artificial en accion</div>'
+            '<h1 class="hero-title">Deteccion de<br><span>DeepFakes</span></h1>'
+            '<p class="hero-sub">'
+            'Determina si una imagen facial es <strong>autentica</strong> o ha sido '
+            '<strong>generada por IA</strong> mediante analisis profundo '
+            'con mapas de activacion.</p>'
             '</div>',
             unsafe_allow_html=True,
         )
 
-        hcol, ecol = st.columns(2)
+        uploaded_file = st.file_uploader(
+            "Arrastra una imagen facial aqui",
+            type=["jpg", "jpeg", "png"],
+            help="Formatos: JPG, JPEG, PNG",
+        )
 
-        with hcol:
-            st.markdown(
-                '<div class="card">'
-                '<p class="card-label">Mapa de Activacion Grad-CAM</p>',
-                unsafe_allow_html=True,
+        col_btn, col_preview = st.columns([3, 2])
+        with col_btn:
+            analyze = st.button(
+                "Ejecutar Analisis",
+                type="primary",
+                disabled=not (model_ready and uploaded_file is not None),
+                use_container_width=True,
             )
-            st.image(res["overlay"], caption="Regiones de mayor influencia en la decision",
-                     use_container_width=True)
+
+        if uploaded_file is not None:
+            image = Image.open(uploaded_file).convert("RGB")
+            with col_preview:
+                st.markdown('<p class="preview-lbl">Previsualizacion</p>', unsafe_allow_html=True)
+                st.image(image, width=200)
+
+            if analyze:
+                analyzing = st.empty()
+                analyzing.markdown(
+                    '<div class="loading-box">'
+                    '<div class="loading-spin"></div>'
+                    '<div class="loading-txt">Analizando imagen...</div>'
+                    '</div>',
+                    unsafe_allow_html=True,
+                )
+                try:
+                    class_idx, confidence, logits = predict_image(model, image)
+                    class_name = CLASS_NAMES[class_idx]
+                    heatmap_raw, heatmap_resized = gradcam.generate(image, class_idx)
+                    overlay = gradcam.overlay_heatmap(image, heatmap_resized)
+                    explanation = gradcam.generate_explanation(class_idx, confidence, heatmap_resized)
+                    overlay_b64 = image_to_base64(overlay)
+                    image_b64 = image_to_base64(image)
+
+                    st.session_state.current_result = {
+                        "class_idx": class_idx, "class_name": class_name,
+                        "confidence": confidence, "image": image,
+                        "image_b64": image_b64, "overlay": overlay,
+                        "overlay_b64": overlay_b64, "heatmap_raw": heatmap_raw,
+                        "heatmap_resized": heatmap_resized, "explanation": explanation,
+                        "logits": logits,
+                    }
+                    st.session_state.history.append({
+                        "class_name": class_name, "confidence": confidence,
+                        "image_b64": image_b64, "overlay_b64": overlay_b64,
+                    })
+                    if len(st.session_state.history) > MAX_HISTORY:
+                        st.session_state.history = st.session_state.history[-MAX_HISTORY:]
+                    analyzing.empty()
+                except Exception as e:
+                    analyzing.empty()
+                    st.error(f"Error durante el analisis: {e}")
+                    logger.error(f"Error en analisis: {e}", exc_info=True)
+
+        if st.session_state.current_result is not None:
+            res = st.session_state.current_result
+            is_fake = res["class_idx"] == 0
+            cls = "fake" if is_fake else "real"
+            color = "#D4878F" if is_fake else "#A8C8A0"
+
             st.markdown(
-                '<div class="heat-legend">'
-                '<span>Baja</span>'
-                '<div class="heat-bar"></div>'
-                '<span>Alta</span>'
+                '<div class="sec-title">'
+                '<div class="sec-accent"></div>'
+                'Resultados del Analisis'
                 '</div>',
                 unsafe_allow_html=True,
             )
-            hd = (res["heatmap_raw"] * 255).astype(np.uint8)
-            hp = Image.fromarray(hd, mode="L").resize((224, 224))
-            st.markdown(
-                '<p style="font-size:0.75rem;color:var(--text-muted);margin:0.75rem 0 0.4rem;'
-                'font-weight:300;">Activacion pura</p>',
-                unsafe_allow_html=True,
-            )
-            st.image(hp, width=120)
-            st.markdown('</div>', unsafe_allow_html=True)
 
-        with ecol:
-            st.markdown(
-                f'<div class="card">'
-                f'<p class="card-label">Informe</p>'
-                f'<div class="explain-box">{res["explanation"]}</div>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-
-        st.markdown(
-            '<div class="sec-title">'
-            '<div class="sec-accent"></div>'
-            'Pruebas de Robustez'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            '<p style="font-size:0.75rem;color:var(--text-soft);margin-bottom:0.75rem;'
-            'font-weight:300;">Efecto de la compresion JPEG en la prediccion.</p>',
-            unsafe_allow_html=True,
-        )
-
-        rb1, rb2, rb3 = st.columns(3)
-        with rb1: b100 = st.button("QF 100  Maxima calidad", use_container_width=True, key="qf100")
-        with rb2: b75 = st.button("QF 75  Calidad media", use_container_width=True, key="qf75")
-        with rb3: b50 = st.button("QF 50  Calidad baja", use_container_width=True, key="qf50")
-
-        rob_res = []
-        for qf, btn in [(100, b100), (75, b75), (50, b50)]:
-            if btn:
-                comp = compress_image(res["image"], qf)
-                cidx, cconf, _ = predict_image(model, comp)
-                cname = CLASS_NAMES[cidx]
-                rob_res.append({"qf": qf, "class_name": cname, "confidence": cconf, "image": comp})
-                sym = chr(10008) if cname == "FAKE" else chr(10004)
+            c1, c2, c3 = st.columns(3)
+            with c1:
                 st.markdown(
-                    f'<div class="rob-line">'
-                    f'<b>QF {qf}</b> -- {get_compression_info(qf)}: '
-                    f'{sym} <b>{cname}</b> con <b>{cconf*100:.1f}%</b></div>',
+                    f'<div class="result-box {cls}">'
+                    f'<div class="result-symbol">{chr(10008) if is_fake else chr(10004)}</div>'
+                    f'<p class="result-name {cls}">{res["class_name"]}</p>'
+                    f'<p class="result-foot">Prediccion</p>'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+            with c2:
+                conf = res["confidence"] * 100
+                gc = "#D4878F" if conf < 70 else "#E0C88A" if conf < 90 else "#A8C8A0"
+                st.markdown(
+                    f'<div class="card gauge-box">'
+                    + render_gauge(conf, gc) +
+                    '<p class="gauge-foot">Confianza</p>'
+                    '</div>',
+                    unsafe_allow_html=True,
+                )
+            with c3:
+                score = torch.softmax(res["logits"], dim=1)[0][1].item()
+                st.markdown(
+                    f'<div class="card score-box">'
+                    f'<div class="score-icon">{chr(9762)}</div>'
+                    f'<div class="score-num">{score:.4f}</div>'
+                    f'<div class="score-foot">Score Real</div>'
+                    f'<div class="score-track">'
+                    f'<div class="score-labels"><span>0</span><span>1</span></div>'
+                    f'<div class="score-bar">'
+                    f'<div class="score-fill" style="width:{score*100}%"></div>'
+                    f'</div></div></div>',
                     unsafe_allow_html=True,
                 )
 
-        if rob_res:
-            st.session_state.robustness_results = rob_res
             st.markdown(
-                '<p style="font-size:0.85rem;font-weight:500;color:var(--text);'
-                'margin:1rem 0 0.75rem;">Comparativa visual</p>',
+                '<div class="sec-title">'
+                '<div class="sec-accent"></div>'
+                'Activacion del Modelo'
+                '</div>',
                 unsafe_allow_html=True,
             )
-            cols = st.columns(len(rob_res))
-            for i, rr in enumerate(rob_res):
-                with cols[i]:
-                    rf2 = rr["class_name"] == "FAKE"
-                    rc2 = "#D4878F" if rf2 else "#A8C8A0"
-                    sym2 = chr(10008) if rf2 else chr(10004)
+            hcol, ecol = st.columns(2)
+            with hcol:
+                st.markdown(
+                    '<div class="card">'
+                    '<p class="card-label">Mapa de Activacion Grad-CAM</p>',
+                    unsafe_allow_html=True,
+                )
+                st.image(res["overlay"], caption="Regiones de mayor influencia en la decision",
+                         use_container_width=True)
+                st.markdown(
+                    '<div class="heat-legend">'
+                    '<span>Baja</span>'
+                    '<div class="heat-bar"></div>'
+                    '<span>Alta</span>'
+                    '</div>',
+                    unsafe_allow_html=True,
+                )
+                hd = (res["heatmap_raw"] * 255).astype(np.uint8)
+                hp = Image.fromarray(hd, mode="L").resize((224, 224))
+                st.markdown(
+                    '<p style="font-size:0.75rem;color:var(--text-muted);margin:0.75rem 0 0.4rem;'
+                    'font-weight:300;">Activacion pura</p>',
+                    unsafe_allow_html=True,
+                )
+                st.image(hp, width=120)
+                st.markdown('</div>', unsafe_allow_html=True)
+            with ecol:
+                st.markdown(
+                    f'<div class="card">'
+                    f'<p class="card-label">Informe</p>'
+                    f'<div class="explain-box">{res["explanation"]}</div>'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+
+            st.markdown(
+                '<div class="sec-title">'
+                '<div class="sec-accent"></div>'
+                'Pruebas de Robustez'
+                '</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<p style="font-size:0.75rem;color:var(--text-soft);margin-bottom:0.75rem;'
+                'font-weight:300;">Efecto de la compresion JPEG en la prediccion.</p>',
+                unsafe_allow_html=True,
+            )
+            rb1, rb2, rb3 = st.columns(3)
+            with rb1: b100 = st.button("QF 100  Maxima calidad", use_container_width=True, key="qf100")
+            with rb2: b75 = st.button("QF 75  Calidad media", use_container_width=True, key="qf75")
+            with rb3: b50 = st.button("QF 50  Calidad baja", use_container_width=True, key="qf50")
+
+            rob_res = []
+            for qf, btn in [(100, b100), (75, b75), (50, b50)]:
+                if btn:
+                    comp = compress_image(res["image"], qf)
+                    cidx, cconf, _ = predict_image(model, comp)
+                    cname = CLASS_NAMES[cidx]
+                    rob_res.append({"qf": qf, "class_name": cname, "confidence": cconf, "image": comp})
+                    sym = chr(10008) if cname == "FAKE" else chr(10004)
                     st.markdown(
-                        '<div class="card" style="text-align:center;padding:0.75rem;">',
+                        f'<div class="rob-line">'
+                        f'<b>QF {qf}</b> -- {get_compression_info(qf)}: '
+                        f'{sym} <b>{cname}</b> con <b>{cconf*100:.1f}%</b></div>',
                         unsafe_allow_html=True,
                     )
-                    st.image(rr["image"], caption=f"QF {rr['qf']}", use_container_width=True)
+            if rob_res:
+                st.session_state.robustness_results = rob_res
+                st.markdown(
+                    '<p style="font-size:0.85rem;font-weight:500;color:var(--text);'
+                    'margin:1rem 0 0.75rem;">Comparativa visual</p>',
+                    unsafe_allow_html=True,
+                )
+                cols = st.columns(len(rob_res))
+                for i, rr in enumerate(rob_res):
+                    with cols[i]:
+                        rf2 = rr["class_name"] == "FAKE"
+                        rc2 = "#D4878F" if rf2 else "#A8C8A0"
+                        sym2 = chr(10008) if rf2 else chr(10004)
+                        st.markdown(
+                            '<div class="card" style="text-align:center;padding:0.75rem;">',
+                            unsafe_allow_html=True,
+                        )
+                        st.image(rr["image"], caption=f"QF {rr['qf']}", use_container_width=True)
+                        st.markdown(
+                            f'<p style="font-weight:600;color:{rc2};margin:0.4rem 0 0;'
+                            f'font-size:0.95rem;">{sym2} {rr["class_name"]}</p>'
+                            f'<p style="color:var(--text-muted);font-size:0.75rem;margin:0;'
+                            f'font-weight:300;">{rr["confidence"]*100:.1f}%</p>',
+                            unsafe_allow_html=True,
+                        )
+                        st.markdown('</div>', unsafe_allow_html=True)
+
+            if not model_ready:
+                st.error("No se pudo cargar el modelo. Entrenelo primero: python -m src.train")
+
+            st.markdown(
+                '<div class="footer">'
+                '<strong>DeepFake Detector</strong> &nbsp;&#183;&nbsp; '
+                'DenseNet-121 &nbsp;&#183;&nbsp; '
+                'Dataset 140K Real and Fake Faces'
+                '</div>',
+                unsafe_allow_html=True,
+            )
+
+    # ═══════════════════════════════════════════════
+    # PAGINA: HISTORIAL
+    # ═══════════════════════════════════════════════
+    elif st.session_state.nav_page == "Historial":
+        st.markdown(
+            '<div class="sec-title">'
+            '<div class="sec-accent"></div>'
+            'Historial de Predicciones'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
+        if st.session_state.history:
+            cols = st.columns(min(len(st.session_state.history), MAX_HISTORY))
+            for i, entry in enumerate(reversed(st.session_state.history[:MAX_HISTORY])):
+                with cols[i]:
+                    himg = base64_to_image(entry["image_b64"])
+                    hf = entry["class_name"] == "FAKE"
+                    hc = "#D4878F" if hf else "#A8C8A0"
+                    sym = chr(10008) if hf else chr(10004)
+                    st.markdown('<div class="hist-item">', unsafe_allow_html=True)
+                    st.image(himg, width=85)
                     st.markdown(
-                        f'<p style="font-weight:600;color:{rc2};margin:0.4rem 0 0;'
-                        f'font-size:0.95rem;">{sym2} {rr["class_name"]}</p>'
-                        f'<p style="color:var(--text-muted);font-size:0.75rem;margin:0;'
-                        f'font-weight:300;">{rr["confidence"]*100:.1f}%</p>',
+                        f'<p class="hist-lbl" style="color:{hc};">'
+                        f'{sym} {entry["class_name"]}<br>'
+                        f'<span style="font-size:0.6rem;color:var(--text-muted);'
+                        f'font-weight:300;">{entry["confidence"]*100:.1f}%</span></p>',
                         unsafe_allow_html=True,
                     )
                     st.markdown('</div>', unsafe_allow_html=True)
+        else:
+            st.markdown(
+                '<div style="text-align:center;padding:3rem;color:var(--text-muted);'
+                'font-weight:300;">'
+                'Aun no hay predicciones. Ve a la seccion de Analisis para comenzar.'
+                '</div>',
+                unsafe_allow_html=True,
+            )
 
-    if st.session_state.history:
         st.markdown(
-            '<div class="sec-title">'
-            '<div class="sec-accent"></div>'
-            'Historial'
+            '<div class="footer">'
+            '<strong>DeepFake Detector</strong> &nbsp;&#183;&nbsp; '
+            'DenseNet-121 &nbsp;&#183;&nbsp; '
+            'Dataset 140K Real and Fake Faces'
             '</div>',
             unsafe_allow_html=True,
         )
-        cols = st.columns(min(len(st.session_state.history), MAX_HISTORY))
-        for i, entry in enumerate(reversed(st.session_state.history[:MAX_HISTORY])):
-            with cols[i]:
-                himg = base64_to_image(entry["image_b64"])
-                hf = entry["class_name"] == "FAKE"
-                hc = "#D4878F" if hf else "#A8C8A0"
-                sym = chr(10008) if hf else chr(10004)
-                st.markdown('<div class="hist-item">', unsafe_allow_html=True)
-                st.image(himg, width=85)
-                st.markdown(
-                    f'<p class="hist-lbl" style="color:{hc};">'
-                    f'{sym} {entry["class_name"]}<br>'
-                    f'<span style="font-size:0.6rem;color:var(--text-muted);'
-                    f'font-weight:300;">{entry["confidence"]*100:.1f}%</span></p>',
-                    unsafe_allow_html=True,
-                )
-                st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown(
-        '<div class="footer">'
-        '<strong>DeepFake Detector</strong> &nbsp;&#183;&nbsp; '
-        'DenseNet-121 &nbsp;&#183;&nbsp; '
-        'Dataset 140K Real and Fake Faces'
-        '</div>',
-        unsafe_allow_html=True,
-    )
+    # ═══════════════════════════════════════════════
+    # PAGINA: EXPLICACION DEL MODELO
+    # ═══════════════════════════════════════════════
+    elif st.session_state.nav_page == "Explicacion del Modelo":
+        st.markdown(
+            '<div class="sec-title">'
+            '<div class="sec-accent"></div>'
+            'Explicacion del Modelo'
+            '</div>',
+            unsafe_allow_html=True,
+        )
 
-    if not model_ready:
-        st.error("No se pudo cargar el modelo. Entrenelo primero: python -m src.train")
+        st.markdown(
+            '<div class="card" style="margin-bottom:1rem;">'
+            '<p class="card-label">Arquitectura</p>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<div class="explain-box" style="margin-bottom:1rem;">'
+            'El sistema utiliza <strong>DenseNet-121</strong>, una red neuronal '
+            'convolucional profunda pre-entrenada en <strong>ImageNet</strong>. '
+            'DenseNet conecta cada capa con todas las capas posteriores, '
+            'lo que permite un flujo de gradientes mas eficiente y '
+            'una mejor propagacion de caracteristicas.</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown(
+            '<div class="card" style="margin-bottom:1rem;">'
+            '<p class="card-label">Transfer Learning</p>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<div class="explain-box" style="margin-bottom:1rem;">'
+            'Se aplica <strong>Transfer Learning</strong>: las capas convolucionales '
+            'iniciales (bloques 1-3) se congelan para preservar caracteristicas '
+            'generales de imagenes. Solo el bloque 4 y el clasificador se '
+            're-entrenan con el dataset de 140K rostros reales y falsos.</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown(
+            '<div class="card" style="margin-bottom:1rem;">'
+            '<p class="card-label">Grad-CAM</p>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<div class="explain-box" style="margin-bottom:1rem;">'
+            '<strong>Grad-CAM</strong> (Gradient-weighted Class Activation Mapping) '
+            'genera mapas de calor que resaltan las regiones de la imagen que mas '
+            'influyeron en la decision del modelo. Las areas en tonos rojos/amarillos '
+            'indican mayor influencia, mientras que las azules/verdes indican '
+            'menor relevancia.</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown(
+            '<div class="card">'
+            '<p class="card-label">Dataset</p>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<div class="explain-box">'
+            'Entrenado en <strong>140K Real and Fake Faces</strong> de Kaggle, '
+            'que contiene 70,000 rostros reales (FFHQ) y 70,000 generados '
+            'por <strong>StyleGAN</strong>. Dividido en 70% entrenamiento, '
+            '15% validacion y 15% prueba.</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown(
+            '<div class="footer">'
+            '<strong>DeepFake Detector</strong> &nbsp;&#183;&nbsp; '
+            'DenseNet-121 &nbsp;&#183;&nbsp; '
+            'Dataset 140K Real and Fake Faces'
+            '</div>',
+            unsafe_allow_html=True,
+        )
 
 
 if __name__ == "__main__":
