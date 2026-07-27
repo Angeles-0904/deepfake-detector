@@ -35,7 +35,7 @@ from src.utils import (
 
 st.set_page_config(
     page_title="DeepFake Detector",
-    page_icon="\U0001F98B",
+    page_icon="◇",
     layout="wide",
     initial_sidebar_state="expanded",
 )
