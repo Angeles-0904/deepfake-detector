@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Índice de Anexos - DeepFake Detector</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 20px; }
+        h1 { color: #2C3E50; border-bottom: 3px solid #3498DB; padding-bottom: 10px; }
+        h2 { color: #2980B9; margin-top: 30px; }
+        .anexo { background: white; border-radius: 8px; padding: 15px; margin: 10px 0;
+                 box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .anexo h3 { color: #E74C3C; margin-top: 0; }
+        .imagenes { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
+        .imagenes img { max-width: 300px; border-radius: 4px; border: 1px solid #ddd; }
+        .info { color: #7F8C8D; font-size: 0.9em; }
+        .pendiente { background: #FFF3CD; border: 1px solid #FFC107; padding: 5px 10px;
+                     border-radius: 4px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>📋 ÍNDICE DE ANEXOS - DeepFake Detector</h1>
+    <p class="info">Generado automáticamente el día de la presentación</p>
+
+    <div class="anexo">
+        <h3>Anexo A: Análisis de Características</h3>
+        <p class="info">Archivos: A1_histogramas_color.png, A2_deteccion_bordes_canny.png, A3_analisis_frecuencias_fft.png</p>
+        <div class="imagenes">
+            <img src="anexo_a/A1_histogramas_color.png" alt="A1_histogramas_color.png">
+            <img src="anexo_a/A2_deteccion_bordes_canny.png" alt="A2_deteccion_bordes_canny.png">
+            <img src="anexo_a/A3_analisis_frecuencias_fft.png" alt="A3_analisis_frecuencias_fft.png">
+        </div>
+    </div>
+    <div class="anexo">
+        <h3>Anexo B: Entrenamiento del Modelo</h3>
+        <p class="info">Archivos: B2_arquitectura_densenet121.png, B3_estrategia_congelamiento.png, B4_curvas_entrenamiento.png, B5_resumen_modelo.png</p>
+        <div class="imagenes">
+            <img src="anexo_b/B2_arquitectura_densenet121.png" alt="B2_arquitectura_densenet121.png">
+            <img src="anexo_b/B3_estrategia_congelamiento.png" alt="B3_estrategia_congelamiento.png">
+            <img src="anexo_b/B4_curvas_entrenamiento.png" alt="B4_curvas_entrenamiento.png">
+            <img src="anexo_b/B5_resumen_modelo.png" alt="B5_resumen_modelo.png">
+        </div>
+    </div>
+    <div class="anexo">
+        <h3>Anexo C: Resultados de Evaluación</h3>
+        <p class="info">Archivos: C2_matriz_confusion.png, C3_curva_roc.png, C4_tabla_metricas.png</p>
+        <div class="imagenes">
+            <img src="anexo_c/C2_matriz_confusion.png" alt="C2_matriz_confusion.png">
+            <img src="anexo_c/C3_curva_roc.png" alt="C3_curva_roc.png">
+            <img src="anexo_c/C4_tabla_metricas.png" alt="C4_tabla_metricas.png">
+        </div>
+    </div>
+    <div class="anexo">
+        <h3>Anexo D: Mapas de Calor Grad-CAM</h3>
+        <p class="info">Archivos: D1_gradcam_real.png, D2_gradcam_fake.png, D3_tabla_explicaciones.png</p>
+        <div class="imagenes">
+            <img src="anexo_d/D1_gradcam_real.png" alt="D1_gradcam_real.png">
+            <img src="anexo_d/D2_gradcam_fake.png" alt="D2_gradcam_fake.png">
+            <img src="anexo_d/D3_tabla_explicaciones.png" alt="D3_tabla_explicaciones.png">
+        </div>
+    </div>
+    <div class="anexo">
+        <h3>Anexo E: Interfaz Web (Streamlit)</h3>
+        <p class="info">Archivos: E1_pantalla_principal.png, E2_resultado_real.png, E3_resultado_fake_heatmap.png, E4_explicacion_textual.png, E5_robustez_historial.png</p>
+        <div class="imagenes">
+            <img src="anexo_e/E1_pantalla_principal.png" alt="E1_pantalla_principal.png">
+            <img src="anexo_e/E2_resultado_real.png" alt="E2_resultado_real.png">
+            <img src="anexo_e/E3_resultado_fake_heatmap.png" alt="E3_resultado_fake_heatmap.png">
+            <img src="anexo_e/E4_explicacion_textual.png" alt="E4_explicacion_textual.png">
+            <img src="anexo_e/E5_robustez_historial.png" alt="E5_robustez_historial.png">
+        </div>
+    </div>
+    <div class="anexo">
+        <h3>Anexo F: Prueba de Compresión (Robustez)</h3>
+        <p class="info">Archivos: F1_tabla_compresion.png, F2_curva_robustez.png</p>
+        <div class="imagenes">
+            <img src="anexo_f/F1_tabla_compresion.png" alt="F1_tabla_compresion.png">
+            <img src="anexo_f/F2_curva_robustez.png" alt="F2_curva_robustez.png">
+        </div>
+    </div>
+    <p class="info" style="margin-top: 30px;">
+        📌 Nota: Las imágenes del Anexo E deben ser capturas de pantalla de la app en Streamlit Cloud.
+        Usa la guía en E0_guia_capturas.png para saber qué capturar.
+    </p>
+</body>
+</html>
