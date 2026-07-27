@@ -7,7 +7,7 @@ torchvision>=0.15.0
 
 # === Procesamiento de imágenes ===
 pillow>=10.0.0
-opencv-python>=4.8.0
+opencv-python-headless>=4.8.0
 
 # === Computación científica ===
 numpy>=1.24.0
