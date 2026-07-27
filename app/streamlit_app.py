@@ -35,7 +35,7 @@ from src.utils import (
 
 st.set_page_config(
     page_title="DeepFake Detector",
-    page_icon="\U0001F98B",
+    page_icon="◇",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -651,10 +651,12 @@ def main():
     with st.sidebar:
         st.markdown(
             '<div style="text-align:center;padding:1.25rem 0.5rem 0.25rem;">'
-            '<div style="width:42px;height:42px;margin:0 auto 0.75rem;'
+            '
+<div style="width:42px;height:42px;margin:0 auto 0.75rem;'
             'border:1.5px solid var(--rose-border);border-radius:10px;'
-            'display:flex;align-items:center;justify-content:center;font-size:1.2rem;">'
-            '\U0001F98B</div>'
+            'display:flex;align-items:center;justify-content:center;'
+            'font-family:var(--font-serif);font-size:0.85rem;font-weight:600;'
+            'color:var(--rose);">DF</div>'
             '<p style="font-family:var(--font-serif);font-weight:600;color:var(--text);'
             'margin:0;font-size:1rem;">DeepFake Detector</p>'
             '<p style="font-size:0.6rem;color:var(--text-muted);text-transform:uppercase;'
@@ -713,7 +715,7 @@ def main():
     st.markdown(
         '<div class="header">'
         '<div class="header-left">'
-        '<div class="header-logo">\U0001F98B</div>'
+        '<div class="header-logo" style="font-family:var(--font-serif);font-weight:600;color:var(--rose);font-size:0.85rem;">DF</div>'
         '<div>'
         '<p class="header-title">DeepFake Detector</p>'
         '<p class="header-sub">Computer Vision &bull; Deep Learning</p>'
